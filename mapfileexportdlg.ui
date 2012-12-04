@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <author>Gary Sherman</author>
+ <class>MapfileExportDlg</class>
+ <widget class="QDialog" name="MapfileExportDlg">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>547</width>
+    <height>479</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>RT MapServer Exporter - Save project to MapFile</string>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Map file</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Map file</string>
+        </property>
+        <property name="buddy">
+         <cstring>txtMapFilePath</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="txtMapFilePath">
+        <property name="toolTip">
+         <string>Name for the map file to be created from the QGIS project file</string>
+        </property>
+        <property name="text">
+         <string notr="true"/>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QToolButton" name="btnChooseFile">
+        <property name="text">
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Help|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QGroupBox" name="grpOptions">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Label options</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="checkBoxForce">
+        <property name="toolTip">
+         <string>Forces labels on, regardless of collisions. Available only for cached labels.</string>
+        </property>
+        <property name="text">
+         <string>Force</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QCheckBox" name="checkBoxPartials">
+        <property name="toolTip">
+         <string>Can text run off the edge of the map?</string>
+        </property>
+        <property name="text">
+         <string>Partials</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Web</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label6">
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Online resource URL</string>
+        </property>
+        <property name="buddy">
+         <cstring>txtMapServerUrl</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="txtMapServerUrl">
+        <property name="toolTip">
+         <string>The URL to the mapserver executable.
+
+For example: 
+http://my.host.com/cgi-bin/mapserv.exe</string>
+        </property>
+        <property name="text">
+         <string notr="true">http://localhost/cgi-bin/mapserv</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QGroupBox" name="grpMap">
+     <property name="title">
+      <string>Map</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label1">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Name</string>
+        </property>
+        <property name="buddy">
+         <cstring>txtMapName</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QLabel" name="label5">
+        <property name="text">
+         <string>Image type</string>
+        </property>
+        <property name="indent">
+         <number>20</number>
+        </property>
+        <property name="buddy">
+         <cstring>cmbMapImageType</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5">
+       <widget class="QComboBox" name="cmbMapImageType"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label2">
+        <property name="text">
+         <string>Width</string>
+        </property>
+        <property name="buddy">
+         <cstring>txtMapWidth</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="txtMapWidth">
+        <property name="text">
+         <string notr="true">600</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="label3">
+        <property name="text">
+         <string>Height</string>
+        </property>
+        <property name="indent">
+         <number>20</number>
+        </property>
+        <property name="buddy">
+         <cstring>txtMapHeight</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QLineEdit" name="txtMapHeight">
+        <property name="text">
+         <string notr="true">600</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QLabel" name="label4">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Units</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="buddy">
+         <cstring>cmbMapUnits</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="5">
+       <widget class="QComboBox" name="cmbMapUnits">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label6_2">
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Shape path</string>
+        </property>
+        <property name="buddy">
+         <cstring>txtMapServerUrl</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="5">
+       <widget class="QLineEdit" name="txtMapShapePath">
+        <property name="toolTip">
+         <string>The path to the folder where shapefiles are stored.</string>
+        </property>
+        <property name="text">
+         <string notr="true"/>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="3">
+       <widget class="QLineEdit" name="txtMapName">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string notr="true">QGIS-MAP</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="6">
+       <widget class="QGroupBox" name="groupBox_3">
+        <property name="title">
+         <string>Fontset</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_6">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label6_3">
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Path</string>
+           </property>
+           <property name="buddy">
+            <cstring>txtMapServerUrl</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="txtMapFontsetPath">
+           <property name="toolTip">
+            <string>path</string>
+           </property>
+           <property name="text">
+            <string notr="true">[fontsetpath]</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QCheckBox" name="checkCreateFontFile">
+           <property name="toolTip">
+            <string>Forces labels on, regardless of collisions. Available only for cached labels.</string>
+           </property>
+           <property name="text">
+            <string>Generate used fonts file</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+ <tabstops>
+  <tabstop>txtMapFilePath</tabstop>
+  <tabstop>txtMapName</tabstop>
+  <tabstop>cmbMapImageType</tabstop>
+  <tabstop>txtMapWidth</tabstop>
+  <tabstop>txtMapHeight</tabstop>
+  <tabstop>cmbMapUnits</tabstop>
+  <tabstop>txtMapShapePath</tabstop>
+  <tabstop>txtMapServerUrl</tabstop>
+  <tabstop>checkBoxForce</tabstop>
+  <tabstop>checkBoxPartials</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>MapfileExportDlg</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>435</x>
+     <y>372</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>240</x>
+     <y>223</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>MapfileExportDlg</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>540</x>
+     <y>352</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>597</x>
+     <y>210</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
