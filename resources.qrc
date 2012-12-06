@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/rt_mapserver_exporter">
+        <file alias="icons/logo">icons/logo.png</file>
+        <file alias="icons/about">icons/about.png</file>
+    </qresource>
+</RCC>

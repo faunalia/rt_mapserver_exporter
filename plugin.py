@@ -23,20 +23,43 @@ email                : brush.tyler@gmail.com
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+import resources_rc
+
 class Plugin:
     def __init__(self, iface):
         self.iface = iface
 
     def initGui(self):
-        self.action = QAction(QIcon(":/plugins/RT_MapServer_Exporter/logo"), "Export project to mapfile", self.iface.mainWindow())
+        self.action = QAction(QIcon(":/rt_mapserver_exporter/icons/logo"), "Export project to mapfile", self.iface.mainWindow())
         QObject.connect(self.action, SIGNAL("triggered()"), self.run)
-        self.iface.addToolBarIcon(self.action)
-        self.iface.addPluginToMenu("RT MapServer Exporter", self.action)
+
+        self.aboutAction = QAction( QIcon( ":/rt_mapserver_exporter/icons/about" ), "About", self.iface.mainWindow() )
+        QObject.connect( self.aboutAction, SIGNAL("triggered()"), self.about )
+
+        if hasattr(self.iface, "addPluginToWebMenu"):
+            self.iface.addWebToolBarIcon(self.action)
+            self.iface.addPluginToWebMenu("RT MapServer Exporter", self.action)
+            self.iface.addPluginToWebMenu("RT MapServer Exporter", self.aboutAction)
+        else:
+            self.iface.addToolBarIcon(self.action)
+            self.iface.addPluginToMenu("RT MapServer Exporter", self.action)
+            self.iface.addPluginToMenu("RT MapServer Exporter", self.aboutAction)
 
     def unload(self):
-        self.iface.removeToolBarIcon(self.action)
-        self.iface.removePluginMenu("RT MapServer Exporter", self.action)
-        self.action = None
+        if hasattr(self.iface, "removePluginWebMenu"):
+            self.iface.removeWebToolBarIcon(self.action)
+            self.iface.removePluginWebMenu("RT MapServer Exporter", self.action)
+            self.iface.removePluginWebMenu("RT MapServer Exporter", self.aboutAction)
+        else:
+            self.iface.removeToolBarIcon(self.action)
+            self.iface.removePluginMenu("RT MapServer Exporter", self.action)
+            self.iface.removePluginMenu("RT MapServer Exporter", self.aboutAction)
+
+    def about(self):
+        """ display the about dialog """
+        from .DlgAbout import DlgAbout
+        dlg = DlgAbout( self.iface.mainWindow() )
+        dlg.exec_()
 
     def run(self):
         from .mapfileexportdlg import MapfileExportDlg
