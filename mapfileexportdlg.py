@@ -26,7 +26,7 @@ from PyQt4.QtGui import *
 from qgis.core import *
 from qgis.gui import *
 
-from mapfileexportdlg_ui import Ui_MapfileExportDlg
+from .ui.mapfileexportdlg_ui import Ui_MapfileExportDlg
 import mapscript
 
 class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
@@ -106,7 +106,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
     def selectMapFile(self):
         # retrieve the last used map file path
         settings = QSettings()
-        lastUsedFile = settings.value("/RT MapServer Exporter/lastUsedFile", "").toString()
+        lastUsedFile = settings.value("/rt_mapserver_exporter/lastUsedFile", "").toString()
 
         # ask for choosing where to store the map file
         filename = QFileDialog.getSaveFileName(self, "Select where to save the map file", lastUsedFile, "MapFile (*.map)")
@@ -114,11 +114,16 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
             return
 
         # store the last used map file path
-        settings.setValue("/RT MapServer Exporter/lastUsedFile", filename)
+        settings.setValue("/rt_mapserver_exporter/lastUsedFile", filename)
         # update the displayd path
         self.txtMapFilePath.setText( filename )
 
     def accept(self):
+        # check user inputs
+        if self.txtMapFilePath.text() == "":
+            QMessageBox.warning(self, "RT MapServer Exporter", "Mapfile output path is required")
+            return
+
         # create a new ms_map
         ms_map = mapscript.mapObj()
         ms_map.name = unicode( self.txtMapName.text() ).encode('utf8')
@@ -266,7 +271,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
 
             else:
                 # use a SLD file set the layer style
-                tempSldFile = QTemporaryFile("RT MapServer Exporter-XXXXXX.sld")
+                tempSldFile = QTemporaryFile("rt_mapserver_exporter-XXXXXX.sld")
                 tempSldFile.open()
                 tempSldPath = tempSldFile.fileName()
                 tempSldFile.close()
@@ -280,7 +285,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
                     with open( unicode(tempSldPath), 'r' ) as fin:
                         sldContents = fin.read()
                     if mapscript.MS_SUCCESS != ms_layer.applySLD( sldContents, ms_layer.name ):
-                        QgsMessageLog.logMessage( u"An error occurs applying the SLD style", "RT MapServer Exporter" )
+                        QgsMessageLog.logMessage( u"Something went wrong applying the SLD style to the layer '%s'" % ms_layer.name, "RT MapServer Exporter" )
                     QFile.remove( tempSldPath )
 
             # set layer labels
@@ -310,15 +315,21 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
                     ms_label.offsety = int( palLayer.yOffset )
                     ms_label.angle = palLayer.angleOffset
 
-                    r,g,b,a = palLayer.textColor.getRgb()
-                    ms_label.color.setRGB( r, g, b )
-                    ms_label.font = unicode( palLayer.textFont.family() ).encode('utf8')
+                    # set label font name, size and color
+                    fontFamily = palLayer.textFont.family().replace(" ", "")
+                    fontStyle = palLayer.textNamedStyle.replace(" ", "")
+                    ms_label.font = unicode( u"%s-%s" % (fontFamily, fontStyle) ).encode('utf8')
                     if palLayer.textFont.pixelSize() > 0:
                         ms_label.size = int( palLayer.textFont.pixelSize() )
+                    r,g,b,a = palLayer.textColor.getRgb()
+                    ms_label.color.setRGB( r, g, b )
+
                     if palLayer.fontLimitPixelSize:
                         ms_label.minsize = palLayer.fontMinPixelSize
                         ms_label.maxsize = palLayer.fontMaxPixelSize
                     ms_label.wrap = unicode( palLayer.wrapChar ).encode('utf8')
+
+                    ms_label.priority = palLayer.priority
 
                     # TODO: convert buffer size to pixels
                     ms_label.buffer = int( palLayer.bufferSize )
@@ -334,41 +345,40 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
         if mapscript.MS_SUCCESS != ms_map.save( unicode( self.txtMapFilePath.text() ).encode('utf8') ):
             return
 
+        # Most of the following code does not use mapscript because mapscript 
+        # checks if paths you supply exists, but usually the QGIS client used 
+        # to generate the mafile is not the server mapserver is running on. 
+
         # get the mapfile content so we can work on it
         with open( unicode(self.txtMapFilePath.text()), 'r' ) as fin:
             partsContentChanged = False
             parts = QString(fin.read()).split(u"\n")
 
-        if self.checkCreateFontFile.isChecked():
-            # get the list of used fonts, search for FONT keywords
-            fonts = []
-            searchFontRx = QRegExp("^\\s*FONT\\s+")
-            for line in parts.filter( searchFontRx ):
-                # remove the quotes
-                fontName = line.replace(searchFontRx, "")[1:-1]
-                if fonts.count( fontName ) == 0:
-                    fonts.append( fontName )
 
-            letterNumRx = QRegExp("[^-a-zA-Z0-9_]")
-            for index, fontName in enumerate(fonts):
-                fontRx = QRegExp( "^(\\s*FONT\\s+)([\"'])%s(\\2\\s*)$" % QRegExp.escape(fontName) )
-                fontAlias = QString(fontName).replace(letterNumRx, "-")
-                parts = parts.replaceInStrings( fontRx, "\\1\\2%s\\3" % fontAlias )
+        # get the list of used font aliases searching for FONT keywords
+        fonts = []
+        searchFontRx = QRegExp("^\\s*FONT\\s+")
+        for line in parts.filter( searchFontRx ):
+            # get the font alias, remove quotes around it
+            fontName = line.replace(searchFontRx, "")[1:-1]
+            # remove spaces within the font name
+            fontAlias = QString(fontName).replace(" ", "")
+
+            if fontAlias not in fonts:
+                # append the font alias to the font list
+                fonts.append( fontAlias )
+
+                # update the font alias in the mapfile
+                replaceFontRx = QRegExp(u"^(\\s*FONT\\s+\")%s(\".*)$" % QRegExp.escape(fontName))
+                parts.replaceInStrings(replaceFontRx, u"\\1%s\\2" % fontAlias)
                 partsContentChanged = True
 
-                # update fonts list
-                fonts[index] = fontAlias
-
-            # create the font file
+        if self.checkCreateFontFile.isChecked():
+            # create the file containing the list of font aliases used in the mapfile
             fontPath = QFileInfo(self.txtMapFilePath.text()).dir().filePath(u"fonts.txt")
             with open( unicode(fontPath), 'w' ) as fout:
-                letterNumRx = QRegExp("[^-a-zA-Z0-9_]")
-                for fontName in fonts:
-                    fontFile = fontName.toLower() # "/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-C"
-                    fout.write( u"%s\t\t%s.ttf" % (fontName, fontFile) )
-
-            # XXX for debugging only
-            self.txtMapFontsetPath.setText( fontPath )
+                for fontAlias in fonts:
+                    fout.write( unicode(fontAlias) )
 
         if self.txtMapFontsetPath.text() != "":
             # add the FONTSET keyword with the associated path
@@ -377,16 +387,18 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
                 parts.insert( pos+1, u'  FONTSET "%s"' % self.txtMapFontsetPath.text() )
                 partsContentChanged = True
             else:
-                QgsMessageLog.logMessage( u"Unable to locate the 'WEB' keyword in the map file...", "RT MapServer Exporter" )
+                QgsMessageLog.logMessage( u"'FONTSET' keyword not added to the mapfile: unable to locate the 'WEB' keyword...", "RT MapServer Exporter" )
 
         if partsContentChanged:
-            # store the file again at the same position
+            # the mapfile content changed, store the file again at the same path
             with open( unicode(self.txtMapFilePath.text()), 'w' ) as fout:
                 fout.write( unicode( parts.join(u"\n") ) )
 
         # let's have a look at the map result! :)
-        ms_map = mapscript.mapObj( unicode( self.txtMapFilePath.text() ) )
-        ms_map.draw().save( unicode( self.txtMapFilePath.text() + ".png" ).encode('utf8'), ms_map )
+        # XXX for debugging only: it works when the fontset file contains all 
+        # the used fonts.
+        #ms_map = mapscript.mapObj( unicode( self.txtMapFilePath.text() ) )
+        #ms_map.draw().save( unicode( self.txtMapFilePath.text() + ".png" ).encode('utf8'), ms_map )
 
         QDialog.accept(self)
 
