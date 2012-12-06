@@ -26,7 +26,7 @@ def name():
 def description():
 	return "Export QGIS project to MapFile"
 
-def authorName():
+def author():
 	return "Giuseppe Sucameli (Faunalia)"
 
 def icon():

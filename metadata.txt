@@ -8,7 +8,7 @@ qgisMinimumVersion=1.9
 category=Plugin
 
 author=Giuseppe Sucameli (Faunalia)
-email=brush.tyler@gmail.com
+email=sucameli@faunalia.it
 
 ; end of mandatory metadata
 
@@ -20,7 +20,7 @@ changelog=first version
 tags=export, project, mapserver, mapfile
 
 homepage=http://www.faunalia.com/
-tracker=http://hub.qgis.org/projects/rt_mapserver_exporter
+tracker=http://hub.qgis.org/projects/rtmapserverexporter
 repository=https://github.com/faunalia/rt_mapserver_exporter
 ;repository=http://hub.qgis.org/projects/rt_mapserver_exporter/repository
 
