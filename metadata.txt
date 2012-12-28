@@ -2,7 +2,7 @@
 [general]
 name=RT MapServer Exporter
 description=Export QGIS project to MapFile
-version=0.1
+version=0.2
 qgisMinimumVersion=1.9
 
 category=Plugin
