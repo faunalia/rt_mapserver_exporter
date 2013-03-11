@@ -269,7 +269,11 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
 
             elif layer.providerType() == 'wms':
                 ms_layer.setConnectionType( mapscript.MS_WMS, "" )
-                uri = QgsDataSourceURI( layer.source() )
+                if hasattr(QgsDataSourceURI, 'paramValue'):
+                    uri = QgsDataSourceURI( layer.source() )
+                else:
+                    uri = QUrl( layer.source() )
+                    uri.paramValue = uri.queryItemValue # forward to the QUrl method
                 ms_layer.connection = _toUtf8( uri.paramValue("url") )
 
                 # loop thru wms sub layers
