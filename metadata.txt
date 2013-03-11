@@ -1,8 +1,10 @@
 ; the next section is mandatory
 [general]
 name=RT MapServer Exporter
-description=Export QGIS project to MapFile
-version=0.2
+description=Export QGIS project to MapFile.
+    Developed with funding from Regione Toscana-SITA.
+
+version=0.2.1
 qgisMinimumVersion=1.9
 
 category=Plugin
@@ -22,7 +24,6 @@ tags=export, project, mapserver, mapfile
 homepage=http://www.faunalia.com/
 tracker=http://hub.qgis.org/projects/rtmapserverexporter
 repository=https://github.com/faunalia/rt_mapserver_exporter
-;repository=http://hub.qgis.org/projects/rt_mapserver_exporter/repository
 
 ; path to a icon within the plugin folder
 icon=icons/logo.png

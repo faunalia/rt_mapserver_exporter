@@ -24,7 +24,7 @@ def name():
 	return "RT MapServer Exporter"
 
 def description():
-	return "Export QGIS project to MapFile"
+	return "Export QGIS project to MapFile. Developed with funding from Regione Toscana-SITA."
 
 def author():
 	return "Giuseppe Sucameli (Faunalia)"
@@ -33,7 +33,7 @@ def icon():
 	return "icons/logo.png"
 
 def version():
-	return "0.2"
+	return "0.2.1"
 
 def qgisMinimumVersion():
 	return "1.9"
