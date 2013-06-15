@@ -4,7 +4,7 @@
 /***************************************************************************
 Name                 : RT MapServer Exporter
 Description          : A plugin to export qgs project to mapfile
-Date                 : Oct 21, 2012 
+Date                 : Oct 21, 2012
 copyright            : (C) 2012 by Giuseppe Sucameli (Faunalia)
 email                : brush.tyler@gmail.com
 
@@ -28,6 +28,7 @@ from qgis.gui import *
 
 from .ui.mapfileexportdlg_ui import Ui_MapfileExportDlg
 import mapscript
+import re
 
 _toUtf8 = lambda s: unicode(s).encode('utf8')
 
@@ -36,17 +37,17 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
 
     unitMap = {
         QGis.DecimalDegrees : mapscript.MS_DD,
-        QGis.Meters : mapscript.MS_METERS, 
+        QGis.Meters : mapscript.MS_METERS,
         QGis.Feet : mapscript.MS_FEET
     }
 
     onOffMap = {
-        True : mapscript.MS_ON, 
+        True : mapscript.MS_ON,
         False : mapscript.MS_OFF
     }
 
     trueFalseMap = {
-        True : mapscript.MS_TRUE, 
+        True : mapscript.MS_TRUE,
         False : mapscript.MS_FALSE
     }
 
@@ -114,7 +115,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
             self.txtMapName.setText( title )
 
         # fill the image format combo
-        self.cmbMapImageType.addItems( QStringList(["png", "gif", "jpeg", "svg", "GTiff"]) )
+        self.cmbMapImageType.addItems( ["png", "gif", "jpeg", "svg", "GTiff"] )
 
         QObject.connect( self.btnChooseFile, SIGNAL("clicked()"), self.selectMapFile )
         QObject.connect( self.btnChooseTemplate, SIGNAL("clicked()"), self.selectTemplateBody )
@@ -124,7 +125,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
     def selectMapFile(self):
         # retrieve the last used map file path
         settings = QSettings()
-        lastUsedFile = settings.value("/rt_mapserver_exporter/lastUsedFile", "").toString()
+        lastUsedFile = settings.value("/rt_mapserver_exporter/lastUsedFile", "")
 
         # ask for choosing where to store the map file
         filename = QFileDialog.getSaveFileName(self, "Select where to save the map file", lastUsedFile, "MapFile (*.map)")
@@ -148,7 +149,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
     def selectTemplateFile(self, lineedit):
         # retrieve the last used template file path
         settings = QSettings()
-        lastUsedFile = settings.value("/rt_mapserver_exporter/lastUsedTmpl", "").toString()
+        lastUsedFile = settings.value("/rt_mapserver_exporter/lastUsedTmpl", "")
 
         # ask for choosing where to store the map file
         filename = QFileDialog.getOpenFileName(self, "Select the template file", lastUsedFile, "Template (*.html *.tmpl);;All files (*);;")
@@ -172,14 +173,15 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
         ms_map.name = _toUtf8( self.txtMapName.text() )
 
         # map size
-        (width, widthOk), (height, heightOk) = self.txtMapWidth.text().toInt(), self.txtMapHeight.text().toInt()
+        width, height = int(self.txtMapWidth.text()), int(self.txtMapHeight.text())
+        widthOk, heightOk = isinstance(width, int), isinstance(height, int)
         if widthOk and heightOk:
             ms_map.setSize( width, height )
 
         # map units
         ms_map.units = self.unitMap[ self.canvas.mapUnits() ]
         if self.cmbMapUnits.currentIndex() >= 0:
-            units, ok = self.cmbMapUnits.itemData( self.cmbMapUnits.currentIndex() ).toInt()
+            units, ok = self.cmbMapUnits.itemData( self.cmbMapUnits.currentIndex() )
             if ok:
                 ms_map.units = units
 
@@ -281,7 +283,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
                 styles = []
                 wmsLayerNames = uri.paramValues("layers")
                 wmsLayerStyles = uri.paramValues("styles")
-                for index in range(len(wmsLayerNames)): 
+                for index in range(len(wmsLayerNames)):
                     wmsNames.append( _toUtf8( wmsLayerNames[index] ) )
                     wmsStyles.append( _toUtf8( wmsLayerStyles[index] ) )
 
@@ -309,19 +311,19 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
                 ms_layer.setMetaData( "ows_name", ms_layer.name )
                 #ms_layer.setMetaData( "wfs_server_version", "1.1.1" )
                 ms_layer.setMetaData( "ows_srs", ' '.join(srsList) )
-           
+
             elif layer.providerType() == 'spatialite':
                 ms_layer.setConnectionType( mapscript.MS_OGR, "" )
                 uri = QgsDataSourceURI( layer.source() )
-                ms_layer.connection = _toUtf8( uri.database() )    
-                ms_layer.data = _toUtf8( uri.table() )    
+                ms_layer.connection = _toUtf8( uri.database() )
+                ms_layer.data = _toUtf8( uri.table() )
 
             elif layer.providerType() == 'ogr':
                 #ms_layer.setConnectionType( mapscript.MS_OGR, "" )
-                ms_layer.data = _toUtf8( layer.source().split('|')[0] )    
+                ms_layer.data = _toUtf8( layer.source().split('|')[0] )
 
             else:
-                ms_layer.data = _toUtf8( layer.source() )    
+                ms_layer.data = _toUtf8( layer.source() )
 
             # set layer style
             if layer.type() == QgsMapLayer.RasterLayer:
@@ -351,16 +353,16 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
                     QFile.remove( tempSldPath )
 
             # set layer labels
-            #XXX the following code MUST be removed when QGIS will 
+            #XXX the following code MUST be removed when QGIS will
             # have SLD label support
             labelingEngine = self.canvas.mapRenderer().labelingEngine()
             if labelingEngine and labelingEngine.willUseLayer( layer ):
                 palLayer = labelingEngine.layer( layer.id() )
                 if palLayer.enabled:
                     if not palLayer.isExpression:
-                        ms_layer.labelitem = _toUtf8( palLayer.fieldName )    
+                        ms_layer.labelitem = _toUtf8( palLayer.fieldName )
                     else:
-                        #XXX expressions won't be supported until 
+                        #XXX expressions won't be supported until
                         # QGIS have SLD label support
                         pass
 
@@ -383,7 +385,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
                     # set label font name, size and color
                     fontFamily = palLayer.textFont.family().replace(" ", "")
                     fontStyle = palLayer.textNamedStyle.replace(" ", "")
-                    ms_label.font = _toUtf8( u"%s-%s" % (fontFamily, fontStyle) )    
+                    ms_label.font = _toUtf8( u"%s-%s" % (fontFamily, fontStyle) )
                     if palLayer.textFont.pixelSize() > 0:
                         ms_label.size = int( palLayer.textFont.pixelSize() )
                     r,g,b,a = palLayer.textColor.getRgb()
@@ -392,7 +394,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
                     if palLayer.fontLimitPixelSize:
                         ms_label.minsize = palLayer.fontMinPixelSize
                         ms_label.maxsize = palLayer.fontMaxPixelSize
-                    ms_label.wrap = _toUtf8( palLayer.wrapChar )    
+                    ms_label.wrap = _toUtf8( palLayer.wrapChar )
 
                     ms_label.priority = palLayer.priority
 
@@ -406,45 +408,46 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
                     ms_class = mapscript.classObj()
                     ms_class.addLabel( ms_label )
                     ms_layer.insertClass( ms_class )
-        
+
 
         # save the map file now!
         if mapscript.MS_SUCCESS != ms_map.save( _toUtf8( self.txtMapFilePath.text() )     ):
             return
 
-        # Most of the following code does not use mapscript because it asserts 
-        # paths you supply exists, but this requirement is usually not meet on 
+        # Most of the following code does not use mapscript because it asserts
+        # paths you supply exists, but this requirement is usually not meet on
         # the QGIS client used to generate the mafile.
 
         # get the mapfile content as string so we can manipulate on it
         with open( unicode(self.txtMapFilePath.text()), 'r' ) as fin:
             # parts holds the content lines
-            parts = QString(fin.read()).split(u"\n")
+            parts = fin.read().split(u"\n")
+            
         partsContentChanged = False
 
         # retrieve the list of used font aliases searching for FONT keywords
         fonts = []
-        searchFontRx = QRegExp("^\\s*FONT\\s+")
-        for line in parts.filter( searchFontRx ):
+        searchFontRx = re.compile(u"^\\s*FONT\\s+")
+        for line in filter(searchFontRx.search, parts):
             # get the font alias, remove quotes around it
             fontName = line.replace(searchFontRx, "")[1:-1]
             # remove spaces within the font name
-            fontAlias = QString(fontName).replace(" ", "")
+            fontAlias = fontName.replace(" ", "")
 
             # append the font alias to the font list
             if fontAlias not in fonts:
                 fonts.append( fontAlias )
 
                 # update the font alias in the mapfile
-                # XXX: the following lines cannot be removed since the SLD file 
+                # XXX: the following lines cannot be removed since the SLD file
                 # could refer a font whose name contains spaces. When SLD specs
-                # ate clear on how to handle fonts than we'll think whether 
-                # remove it or not. 
-                replaceFontRx = QRegExp(u"^(\\s*FONT\\s+\")%s(\".*)$" % QRegExp.escape(fontName))
-                parts.replaceInStrings(replaceFontRx, u"\\1%s\\2" % fontAlias)
+                # ate clear on how to handle fonts than we'll think whether
+                # remove it or not.
+                replaceFontRx = re.compile( u"^(\\s*FONT\\s+\")%s(\".*)$" % QRegExp.escape(fontName) )
+                parts = ( replaceFontRx.sub(u"\g<1>%s\g<2>" % fontAlias, part) for part in parts )
                 partsContentChanged = True
 
-        # create the file containing the list of font aliases used in the 
+        # create the file containing the list of font aliases used in the
         # mapfile
         if self.checkCreateFontFile.isChecked():
             fontPath = QFileInfo(self.txtMapFilePath.text()).dir().filePath(u"fonts.txt")
@@ -454,7 +457,8 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
 
         # add the FONTSET keyword with the associated path
         if self.txtMapFontsetPath.text() != "":
-            pos = parts.indexOf( QRegExp("^MAP$") )
+            # get the index of the first instance of MAP string in the list
+            pos = parts.index( filter(lambda x: re.compile("^MAP$").match(x), parts)[0] )
             if pos >= 0:
                 parts.insert( pos+1, u'  FONTSET "%s"' % self.txtMapFontsetPath.text() )
                 partsContentChanged = True
@@ -464,10 +468,10 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
         # if mapfile content changed, store the file again at the same path
         if partsContentChanged:
             with open( unicode(self.txtMapFilePath.text()), 'w' ) as fout:
-                fout.write( unicode( parts.join(u"\n") ) )
+                fout.write( unicode( "\n".join(part for part in parts) ) )
 
         # XXX for debugging only: let's have a look at the map result! :)
-        # XXX it works whether the file pointed by the fontset contains ALL the 
+        # XXX it works whether the file pointed by the fontset contains ALL the
         # aliases of fonts referred from the mapfile.
         #ms_map = mapscript.mapObj( unicode( self.txtMapFilePath.text() ) )
         #ms_map.draw().save( _toUtf8( self.txtMapFilePath.text() + ".png" )    , ms_map )
@@ -488,7 +492,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
 ''' % self.txtMapName.text()
 
         for lid, orientation in self.templateTable.model().getObjectIter():
-            layer = QgsMapLayerRegistry.instance().mapLayer( lid.toString() )
+            layer = QgsMapLayerRegistry.instance().mapLayer( lid )
             if not layer:
                 continue
 
@@ -586,7 +590,7 @@ class TemplateDelegate(QItemDelegate):
             cbo.setEditable(False)
             cbo.setFrame(False)
             for val, txt in TemplateModel.ORIENTATIONS.iteritems():
-                cbo.addItem(txt, QVariant(val))
+                cbo.addItem(txt, val)
             return cbo
         return QItemDelegate.createEditor(self, parent, option, index)
 
@@ -594,7 +598,7 @@ class TemplateDelegate(QItemDelegate):
         """ load data from model to editor """
         m = index.model()
         if index.column() == 1:
-            val = m.data(index, Qt.UserRole).toInt()[0]
+            val = m.data(index, Qt.UserRole)[0]
             editor.setCurrentIndex( editor.findData(val) )
         else:
             # use default
@@ -603,9 +607,9 @@ class TemplateDelegate(QItemDelegate):
     def setModelData(self, editor, model, index):
         """ save data from editor back to model """
         if index.column() == 1:
-            val = editor.itemData(editor.currentIndex()).toInt()[0]
-            model.setData(index, QVariant(TemplateModel.ORIENTATIONS[val]))
-            model.setData(index, QVariant(val), Qt.UserRole)
+            val = editor.itemData(editor.currentIndex())[0]
+            model.setData(index, TemplateModel.ORIENTATIONS[val])
+            model.setData(index, val, Qt.UserRole)
         else:
             # use default
             QItemDelegate.setModelData(self, editor, model, index)
@@ -632,13 +636,13 @@ class TemplateModel(QStandardItemModel):
         self.appendRow( rowdata )
 
         row = self.rowCount()-1
-        self.setData(self.index(row, 0), QVariant(layer.id()), Qt.UserRole)
-        self.setData(self.index(row, 1), QVariant(Qt.Horizontal), Qt.UserRole)
+        self.setData(self.index(row, 0), layer.id(), Qt.UserRole)
+        self.setData(self.index(row, 1), Qt.Horizontal, Qt.UserRole)
 
     def headerData(self, section, orientation, role):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            return QVariant(self.header[section])
-        return QVariant()
+            return self.header[section]
+        return None
 
     def getObject(self, row):
         lid = self.data(self.index(row, 0), Qt.UserRole)
