@@ -4,8 +4,8 @@ name=RT MapServer Exporter
 description=Export QGIS project to MapFile.
     Developed with funding from Regione Toscana-SITA.
 
-version=0.2.1
-qgisMinimumVersion=1.9
+version=0.3.1
+qgisMinimumVersion=2.0
 
 category=Plugin
 
@@ -16,7 +16,7 @@ email=sucameli@faunalia.it
 
 ; start of optional metadata
 
-changelog=first version
+changelog=Update to SIP api from 1.8 to 2.0 
 
 ; tags are in comma separated value format, spaces are allowed
 tags=export, project, mapserver, mapfile

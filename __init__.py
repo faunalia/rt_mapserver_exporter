@@ -33,10 +33,10 @@ def icon():
 	return "icons/logo.png"
 
 def version():
-	return "0.2.1"
+	return "0.3.1"
 
 def qgisMinimumVersion():
-	return "1.9"
+	return "2.0"
 
 def classFactory(iface):
 	from .plugin import Plugin
