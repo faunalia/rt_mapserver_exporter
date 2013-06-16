@@ -125,7 +125,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
     def selectMapFile(self):
         # retrieve the last used map file path
         settings = QSettings()
-        lastUsedFile = settings.value("/rt_mapserver_exporter/lastUsedFile", "")
+        lastUsedFile = settings.value("/rt_mapserver_exporter/lastUsedFile", "", type=str)
 
         # ask for choosing where to store the map file
         filename = QFileDialog.getSaveFileName(self, "Select where to save the map file", lastUsedFile, "MapFile (*.map)")
@@ -149,7 +149,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
     def selectTemplateFile(self, lineedit):
         # retrieve the last used template file path
         settings = QSettings()
-        lastUsedFile = settings.value("/rt_mapserver_exporter/lastUsedTmpl", "")
+        lastUsedFile = settings.value("/rt_mapserver_exporter/lastUsedTmpl", "", type=str)
 
         # ask for choosing where to store the map file
         filename = QFileDialog.getOpenFileName(self, "Select the template file", lastUsedFile, "Template (*.html *.tmpl);;All files (*);;")
