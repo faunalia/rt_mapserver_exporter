@@ -64,29 +64,26 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
 
     @classmethod
     def getLabelPosition(self, palLabel):
-        if palLabel.yQuadOffset == 1:
-            if palLabel.xQuadOffset == -1:
-                return mapscript.MS_UL
-            elif palLabel.xQuadOffset == 0:
-                return mapscript.MS_UC
-            elif palLabel.xQuadOffset == 1:
-                return mapscript.MS_UR
-        elif palLabel.yQuadOffset == 0:
-            if palLabel.xQuadOffset == -1:
-                return mapscript.MS_CL
-            elif palLabel.xQuadOffset == 0:
-                return mapscript.MS_CC
-            elif palLabel.xQuadOffset == 1:
-                return mapscript.MS_CR
-        elif palLabel.yQuadOffset == -1:
-            if palLabel.xQuadOffset == -1:
-                return mapscript.MS_LL
-            elif palLabel.xQuadOffset == 0:
-                return mapscript.MS_LC
-            elif palLabel.xQuadOffset == 1:
-                return mapscript.MS_LR
+        quadrantPosition = palLabel.quadOffset  
+        if quadrantPosition == QgsPalLayerSettings.QuadrantAboveLeft: # y=1 x=-1 
+            return mapscript.MS_UL
+        if quadrantPosition == QgsPalLayerSettings.QuadrantAbove: # y=1 x=0
+            return mapscript.MS_UC
+        if quadrantPosition == QgsPalLayerSettings.QuadrantAboveRight: # y=1 x=1
+            return mapscript.MS_UR
+        if quadrantPosition == QgsPalLayerSettings.QuadrantLeft: # y=0 x=-1
+            return mapscript.MS_CL
+        if quadrantPosition == QgsPalLayerSettings.QuadrantOver: # y=0 x=0
+            return mapscript.MS_CC
+        if quadrantPosition == QgsPalLayerSettings.QuadrantRight: # y=0 x=1
+            return mapscript.MS_CR
+        if quadrantPosition == QgsPalLayerSettings.QuadrantBelowLeft: # y=-1 x=-1 
+            return mapscript.MS_LL
+        if quadrantPosition == QgsPalLayerSettings.QuadrantBelow: # y=-1 x=0
+            return mapscript.MS_LC
+        if quadrantPosition == QgsPalLayerSettings.QuadrantBelowRight: # y=-1 x=1
+            return mapscript.MS_LR
         return mapscript.MS_AUTO
-
 
     def __init__(self, iface, parent=None):
         QDialog.__init__(self, parent)
