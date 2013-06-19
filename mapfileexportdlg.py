@@ -424,10 +424,10 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
 
         # retrieve the list of used font aliases searching for FONT keywords
         fonts = []
-        searchFontRx = re.compile(u"^\\s*FONT\\s+")
+        searchFontRx = re.compile("^\\s*FONT\\s+")
         for line in filter(searchFontRx.search, parts):
             # get the font alias, remove quotes around it
-            fontName = line.replace(searchFontRx, "")[1:-1]
+            fontName = re.sub(searchFontRx, "", line)[1:-1]
             # remove spaces within the font name
             fontAlias = fontName.replace(" ", "")
 
@@ -441,7 +441,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
                 # ate clear on how to handle fonts than we'll think whether
                 # remove it or not.
                 replaceFontRx = re.compile( u"^(\\s*FONT\\s+\")%s(\".*)$" % QRegExp.escape(fontName) )
-                parts = ( replaceFontRx.sub(u"\g<1>%s\g<2>" % fontAlias, part) for part in parts )
+                parts = [ replaceFontRx.sub(u"\g<1>%s\g<2>" % fontAlias, part) for part in parts ]
                 partsContentChanged = True
 
         # create the file containing the list of font aliases used in the
