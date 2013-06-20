@@ -1,0 +1,690 @@
+MAP 
+  # esempio chiamata GETLEGENDGRAPHICS: http://web.regione.toscana.it/geoportale/com.rt.wms.RTmap/wms?map=rt_castore.map&SERVICE=WMS&REQUEST=GetLegendGraphic&VERSION=1.1.1&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=castore_ingombro_carte_derivate
+  # classgroup : http://www.mapserver.org/fr/development/rfc/ms-rfc-39.html
+  #
+  #include has path to proj and other plugins you may need
+  #INCLUDE "config.inc.map"
+  NAME		"rt_cat"  #name to give your map service
+  #EXTENT 545379 4673155 776461 4927945
+  EXTENT 1553037 4673981 1775500 4927805
+  # EXTENT	9.663719 42.209127 12.413394 44.473544
+  SIZE		800 600
+  MAXSIZE	4096
+  UNITS	meters
+  ANGLE       0
+  CONFIG "PROJ_LIB" "/usr/local/share/proj/"
+  CONFIG "MS_ERRORFILE" "/home/archivio/tomcat/server/mapserver_maps/logs/rt_cat_error.log"
+  CONFIG "ON_MISSING_DATA" "LOG"
+  #CONFIG "XSISCHEMA" "EXTERNAL"
+  #CONFIG "XSISCHEMAURI" "/home/vector/prova.xsd"
+  DEBUG 4
+  FONTSET "/home/archivio/tomcat/server/mapserver_maps/fonts/fonts.list"
+  #SYMBOLSET "/home/archivio/tomcat/server/mapserver_maps/symbols/test.sym"
+  SHAPEPATH "/home/vector/vettoriali/db_catasto"
+  # default projection of the map
+  PROJECTION
+    "+init=epsg:3003 +towgs84=0,0,0,0,0,0,0"
+  END
+  DEFRESOLUTION 96
+  RESOLUTION 96
+  IMAGECOLOR 255 255 255
+  IMAGETYPE PNG8
+  OUTPUTFORMAT
+    NAME "AGGA"
+    DRIVER AGG/PNG
+    MIMETYPE "image/png"
+    IMAGEMODE RGBA    #serve RGBA per avere il trasparente
+    EXTENSION "png"
+    FORMATOPTION "GAMMA=1.0"
+    FORMATOPTION "INTERLACE=true"
+    FORMATOPTION "QUANTIZE_DITHER=OFF"
+    FORMATOPTION "COMPRESSION=6"  # Compression: 0=no compression, 9=best, 6=default compression
+    FORMATOPTION "QUANTIZE_FORCE=ON"
+    FORMATOPTION "QUANTIZE_COLORS=256"
+   TRANSPARENT ON
+  END
+  OUTPUTFORMAT
+    NAME "customized_html"
+    MIMETYPE "text/html"
+    DRIVER TEMPLATE
+    FORMATOPTION "FILE=/home/archivio/tomcat/server/mapserver_maps/template/layer/rt_catasto/catasto_customized_html.tmpl"
+    #FORMATOPTION "ATTACHMENT=queryResults.kml"
+  END
+  #il seguente settaggio serve per la GetFeatureInfo in GML via OGR
+  OUTPUTFORMAT
+    NAME "OGRGML"
+    MIMETYPE "text/gml"
+    DRIVER "OGR/GML"
+#    FORMATOPTION "LCO:XSISCHEMA=EXTERNAL"
+#    FORMATOPTION "LCO:XSISCHEMAURI=/home/vector/prova.xsd"
+    FORMATOPTION "STORAGE=filesystem"
+    FORMATOPTION "FORM=multipart"
+    #FORMATOPTION "FILENAME=result.gml"
+  END
+  WEB
+    IMAGEPATH '/home/archivio/tomcat/tomcat-website/webapps/wmsraster/out'
+    IMAGEURL '/wmsraster/out/'
+    LOG "/home/archivio/tomcat/server/mapserver_maps/logs/rt_cat_log.log"
+    TEMPPATH "/home/archivio/tomcat/server/mapserver_maps/temp"
+    LEGENDFORMAT 'text/html'
+    MINSCALEDENOM 1
+    MAXSCALEDENOM 4000000
+    # TEMPLATE '/home/archivio/tomcat/server/mapserver_maps/template/am_prov_region_am_prov.tmpl'
+    # meta data needed for wms/wfs calls
+    METADATA
+      "wms_title" "Geoscopio_wms catasto"
+      # timeout in secondi per la connessione verso un server WMS remoto (default 30s)
+      "wms_connectiontimeout" "15"
+      # il proxy va dichiarato usando l'indirizzo IP, anziche il nome del server
+      "wms_proxy_host" "159.213.32.2"
+      "wms_proxy_port" "8080"
+      "wms_proxy_type" "http"
+      "wms_proxy_auth_type" "basic"
+      "wms_abstract" "Servizio OGC di tipo WMS fornito da Regione Toscana (Sistema Informativo Territoriale ed Ambientale) dedicato specificamente alla consultazione dei dati del Catasto Terreni relativi al territorio toscano mediante clients WMS. I datasets sono ripartiti per provincia sulla base delle informazioni catastali. I dati sono derivanti da una serie di elaborazioni che raffinano il dato originale. Su ogni dataset è disponibile uno specifico campo (DT_ELAB) con la data di elaborazione nel formato 'aaaa/mm/gg'. Tra le elaborazioni effettuate vi è la riproiezione del dato originale dai vari sistemi di riferimento locali in un unico sistema di riferimento. Inoltre, sempre dal dato catastale sono state rimosse le geometrie che per qualche ragione risultavano incongruenti con la loro posizione o erano geometricamente non corrette. I vari dataset hanno ciascuno uno specifico intevallo di visibilità stabilito sulla base del dettaglio informativo in esso contenuto, per conoscere gli specifici intervalli di visibilità si faccia riferimento all' 'abstract' dello specifico strato."
+      "wms_keywordlist" "catasto, toscana"
+      "wms_onlineresource" "http://web.regione.toscana.it/wmsraster/com.rt.wms.RTmap/wms?map=wmscatasto&map_resolution=96&"
+      "wms_schemas_location" "http://schemas.opengeospatial.net/"
+      "wms_server_version" "1.1.0" # questo parametro serve per l'invocazione in cascading di un altro server wms.
+      #"wms_version" "1.3.0"  #parametro inesistente
+      "wms_contactperson" "Settore Sistema Informativo Territoriale ed Ambientale"
+      "wms_contactorganization" "Regione Toscana - Direzione Generale POLITICHE TERRITORIALI, AMBIENTALI E PER LA MOBILITA"
+      "wms_contactposition" "custodian"
+      "wms_srs" "EPSG:25832 EPSG:3003 EPSG:4326 EPSG:3857"
+      #"wms_feature_info_mime_type" "application/vnd.ogc.gml,application/vnd.ogc.wms_xml, text/xml, text/html, text/plain"
+      "wms_feature_info_mime_type" "text/gml,text/html,text/plain,ogr/gml"
+      "wms_enable_request" "*"
+      "wms_accessconstraints" "none"
+      "wms_addresstype" "postal"
+      "wms_address" "Via di Novoli, 26"
+      "wms_city" "Firenze"
+      "wms_stateorprovince" "Regione Toscana"
+      "wms_postcode" "50127"
+      "wms_country" "English" #"Italy"
+      "wms_contactelectronicmailaddress" "servizio.geografico@regione.toscana.it"
+      "wms_fees" "none"
+      "wms_layerlimit" "20"   # non piu' di 20 layer per request
+      "wms_format_list" "image/png,image/jpeg"
+      # seguono metadata INSPIRE
+      # tratto da:
+      # http://mapserver.org/trunk/de/ogc/inspire.html#activation-of-inspire-support
+      #"wms_inspire_capabilities" "http://web.regione.toscana.it/geocatalogo"
+      #"wms_inspire_metadataurl_href" "http://web.regione.toscana.it/geocatalogo/srv/en/csw?service=CSW&version=2.0.2&request=GetRecordById&outputSchema=http://www.isotc211.org/2005/gmd&ElementSetName=full&Id=4d5f1402-5b2b-43ec-949f-92d125179318""
+      "wms_rootlayer_title" "Geoscopio_wms_cat"
+      "wms_rootlayer_abstract" "Servizio OGC di tipo WMS fornito da Regione Toscana (Sistema Informativo Territoriale ed Ambientale) dedicato specificamente alla consultazione dei dati del Catasto Terreni relativi al territorio toscano mediante clients WMS. I datasets sono ripartiti per provincia sulla base delle informazioni catastali. I dati sono derivanti da una serie di elaborazioni che raffinano il dato originale. Su ogni dataset è disponibile uno specifico campo (DT_ELAB) con la data di elaborazione nel formato 'aaaa/mm/gg'. Tra le elaborazioni effettuate vi è la riproiezione del dato originale dai vari sistemi di riferimento locali in un unico sistema di riferimento. Inoltre, sempre dal dato catastale sono state rimosse le geometrie che per qualche ragione risultavano incongruenti con la loro posizione o erano geometricamente non corrette. I vari dataset hanno ciascuno uno specifico intevallo di visibilità stabilito sulla base del dettaglio informativo in esso contenuto, per conoscere gli specifici intervalli di visibilità si faccia riferimento all' 'abstract' dello specifico strato."
+      "wms_rootlayer_keywordlist" "catasto,toscana"
+      "wms_service_onlineresource" "http://web.regione.toscana.it/wmsraster/com.rt.wms.RTmap/wms?map=wmscatasto&"
+      "wms_inspire_metadataurl_format" "application/vnd.ogc.csw.capabilities.response_xml"
+      "wms_keywordlist_ISO_items" "infoMapAccessService" #value according "classification of spatial data services"
+      "wms_keywordlist_vocabulary" "ISO"
+      "ows_schemas_location" "http://schemas.opengis.net"  # e' il valore di default
+      "wms_attribution_logourl_href" "http://web.regione.toscana.it:80/wmsraster/immagini/logo_geoscopio_wms.png"
+      "wms_attribution_logourl_format" "image/png"
+      "wms_attribution_logourl_height" "70"
+      "wms_attribution_logourl_width" "160"
+      # inspire tags
+      "wms_inspire_capabilities" "embed"
+      "wms_languages" "ita,eng"
+      "wms_inspire_temporal_reference" "2012-07-18"
+      "wms_inspire_mpoc_name" "Regione Toscana - Settore Sistema Informativo Territoriale ed Ambientale"
+      "wms_inspire_mpoc_email" "servizio.geografico@regione.toscana.it"
+      "wms_inspire_metadatadate" "2012-07-24"
+      "wms_inspire_resourcelocator" "http://web.regione.toscana.it/wmsraster/com.rt.wms.RTmap/wms?map=wmscatasto&SERVICE=WMS&request=getcapabilities"
+      "wms_inspire_keyword" "infoMapAccessService"
+      "wms_keywordlist_ISO_items" "infoMapAccessService"
+      "wms_keywordlist_vocabulary" "ISO"
+      # fine tags inspire
+      "wms_title.ita" "Geoscopio_wms CATASTO"
+      "wms_title.eng" "Geoscopio_wms CATASTO"
+      "wms_abstract.ita" "Servizio OGC di tipo WMS fornito da Regione Toscana (Sistema Informativo Territoriale ed Ambientale) dedicato specificamente alla consultazione dei dati del Catasto Terreni relativi al territorio toscano mediante clients WMS. I datasets sono ripartiti per provincia sulla base delle informazioni catastali. I dati sono derivanti da una serie di elaborazioni che raffinano il dato originale. Su ogni dataset è disponibile uno specifico campo (DT_ELAB) con la data di elaborazione nel formato 'aaaa/mm/gg'. Tra le elaborazioni effettuate vi è la riproiezione del dato originale dai vari sistemi di riferimento locali in un unico sistema di riferimento. Inoltre, sempre dal dato catastale sono state rimosse le geometrie che per qualche ragione risultavano incongruenti con la loro posizione o erano geometricamente non corrette. I vari dataset hanno ciascuno uno specifico intevallo di visibilità stabilito sulla base del dettaglio informativo in esso contenuto, per conoscere gli specifici intervalli di visibilità si faccia riferimento all' 'abstract' dello specifico strato."
+      "wms_abstract.eng" "Servizio OGC di tipo WMS fornito da Regione Toscana (Sistema Informativo Territoriale ed Ambientale) dedicato specificamente alla consultazione dei dati del Catasto Terreni relativi al territorio toscano mediante clients WMS. I datasets sono ripartiti per provincia sulla base delle informazioni catastali. I dati sono derivanti da una serie di elaborazioni che raffinano il dato originale. Su ogni dataset è disponibile uno specifico campo (DT_ELAB) con la data di elaborazione nel formato 'aaaa/mm/gg'. Tra le elaborazioni effettuate vi è la riproiezione del dato originale dai vari sistemi di riferimento locali in un unico sistema di riferimento. Inoltre, sempre dal dato catastale sono state rimosse le geometrie che per qualche ragione risultavano incongruenti con la loro posizione o erano geometricamente non corrette. I vari dataset hanno ciascuno uno specifico intevallo di visibilità stabilito sulla base del dettaglio informativo in esso contenuto, per conoscere gli specifici intervalli di visibilità si faccia riferimento all' 'abstract' dello specifico strato."
+      "wms_rootlayer_title.ita" "Geoscopio_wms CATASTO"
+      "wms_rootlayer_title.eng" "geoscopio_wms CATASTO"
+      "wms_rootlayer_abstract.ita" "Servizio OGC di tipo WMS fornito da Regione Toscana (Sistema Informativo Territoriale ed Ambientale) dedicato specificamente alla consultazione dei dati del Catasto Terreni relativi al territorio toscano mediante clients WMS. I datasets sono ripartiti per provincia sulla base delle informazioni catastali. I dati sono derivanti da una serie di elaborazioni che raffinano il dato originale. Su ogni dataset è disponibile uno specifico campo (DT_ELAB) con la data di elaborazione nel formato 'aaaa/mm/gg'. Tra le elaborazioni effettuate vi è la riproiezione del dato originale dai vari sistemi di riferimento locali in un unico sistema di riferimento. Inoltre, sempre dal dato catastale sono state rimosse le geometrie che per qualche ragione risultavano incongruenti con la loro posizione o erano geometricamente non corrette. I vari dataset hanno ciascuno uno specifico intevallo di visibilità stabilito sulla base del dettaglio informativo in esso contenuto, per conoscere gli specifici intervalli di visibilità si faccia riferimento all' 'abstract' dello specifico strato."
+      "wms_rootlayer_abstract.eng" "Servizio OGC di tipo WMS fornito da Regione Toscana (Sistema Informativo Territoriale ed Ambientale) dedicato specificamente alla consultazione dei dati del Catasto Terreni relativi al territorio toscano mediante clients WMS. I datasets sono ripartiti per provincia sulla base delle informazioni catastali. I dati sono derivanti da una serie di elaborazioni che raffinano il dato originale. Su ogni dataset è disponibile uno specifico campo (DT_ELAB) con la data di elaborazione nel formato 'aaaa/mm/gg'. Tra le elaborazioni effettuate vi è la riproiezione del dato originale dai vari sistemi di riferimento locali in un unico sistema di riferimento. Inoltre, sempre dal dato catastale sono state rimosse le geometrie che per qualche ragione risultavano incongruenti con la loro posizione o erano geometricamente non corrette. I vari dataset hanno ciascuno uno specifico intevallo di visibilità stabilito sulla base del dettaglio informativo in esso contenuto, per conoscere gli specifici intervalli di visibilità si faccia riferimento all' 'abstract' dello specifico strato."
+      # tags per rendering remoto
+      "wms_sld_enabled" "false"
+      #"ows_sld_enabled" "false"
+    END
+  END 
+  # End Web
+  # layers we will want to display
+  # Legend
+  LEGEND
+    IMAGECOLOR 255 255 255
+    STATUS ON
+    KEYSIZE 30 20
+    KEYSPACING 5 5
+    POSITION lr
+    POSTLABELCACHE true
+    # label object
+    LABEL
+      TYPE BITMAP
+      SIZE MEDIUM
+      COLOR 0 89 0
+    END
+    #TEMPLATE '/home/archivio/tomcat/server/mapserver_maps/template/legend/castore_legend.tmpl'
+  END
+  # inizio parte di definizione dei Simboli
+#  SYMBOL
+#    NAME "simbtoponomi"
+#    TYPE vector # Type of symbol
+#    # Start of the symbol geometry
+#    POINTS
+#      1 0
+#      0 1
+#      1 1
+#      1 1
+#      0 1
+#    END
+#    FILLED true
+#    # Place the according to its center
+#    ANCHORPOINT 0.5 0.5
+#  END # end of SYMBOL    
+  # fine parte simboli
+  # Layer objects are defined beneath the map object.  You need at least one
+  # layer defined in your map file before you can display a map...  You can
+  # define as many layers as you'd like although a limit is typically hard-coded
+  # in map.h in the MapServer source.  The default limit is set at 100.  You'd
+  # have to have a very specialized application to need more than 100 layers in
+  # your application.
+
+  # Start of LAYER DEFINITIONS ---------------------------------------------
+  LAYER
+    NAME "rt_cat.disclaimer_sita"
+    STATUS DEFAULT
+    TYPE ANNOTATION
+    METADATA
+      "wms_title" "Disclaimer del servizio WMS"
+      "wms_abstract" "Questo disclaimer viene applicato in automatico a tutte le mappe generate"
+      "wms_keywordlist" "toscana,catasto"
+    END
+    TRANSFORM LL
+    FEATURE
+      POINTS
+        20 -150
+      END
+      TEXT '® Regione Toscana - S.I.T.A. - Dati A.d.T. - SIGMATER'
+    END
+#    VALIDATION
+#      'time' '...'
+#    END
+    CLASS
+      LABEL
+        TYPE TRUETYPE
+        FORCE true
+        COLOR 0 0 0
+        ANTIALIAS false
+        OUTLINECOLOR 255 255 255
+        OUTLINEWIDTH 2
+        PRIORITY 10
+        SIZE 7
+        ANGLE 90
+        FONT "LiberationSans-Regular"
+        #POSITION auto
+      END
+    END
+  END
+
+#========= init ACQUE ===
+# acque - RT
+  LAYER 
+    NAME "rt_cat.idcatacque.rt"
+    STATUS OFF
+    TYPE POLYGON
+    CONNECTIONTYPE OGR
+    CONNECTION "/home/vector/vettoriali/db_catasto/regione_toscana/adt_toscana.sqlite"
+    #DATA "select PKUID,BELFIORE,ZONA_CENS,FOGLIO,ALLEGATO,SVILUPPO,SIGLAPROV,CODCOM,COMUNE,DTSCA,DTELAB,GEOMETRY from ACQUE"
+    DATA 'ACQUE'
+    PROJECTION
+      "init=epsg:3003"
+    END
+    METADATA
+      "wms_title" "Acque - AdT Catasto Terreni"
+      "wms_abstract" "Scala di visibilita 1:1 - 1:500.000. Dataset 'acque' proveniente dal Catasto Terreni dell' Agenzia del Territorio. Territorio coperto: intera regione"
+      "wms_abstract.ita" "Scala di visibilita 1:1 - 1:500.000. Dataset 'acque' proveniente dal Catasto Terreni dell' Agenzia del Territorio. Territorio coperto: intera regione"
+      "wms_keywordlist" "toscana,catasto,acqua,fiume,corso"
+      "wms_extent" "1553037 4673981 1775500 4927805"
+      #  "wms_srs" "EPSG:25832 EPSG:3003 EPSG:4326"
+      "wms_bbox_extended" "true"
+      "ows_include_items" "all"
+    END
+    MAXSCALEDENOM 500100
+    MINSCALEDENOM 1
+    OPACITY 100
+    PROCESSING "APPROXIMATION_SCALE=FULL"
+    CLASS
+      NAME 'acque'
+      STYLE
+         WIDTH 0.5 
+         OUTLINECOLOR 6 206 249
+         ANTIALIAS false
+         OPACITY 100
+      END
+      STYLE
+         COLOR 6 206 249
+         ANTIALIAS false
+         OPACITY 10
+      END
+    END
+  END
+#-----
+#========= init STRADE ===
+# strade - RT
+  LAYER 
+    NAME "rt_cat.idcatstrade.rt"
+    STATUS OFF
+    TYPE POLYGON
+    CONNECTIONTYPE OGR
+    CONNECTION '/home/vector/vettoriali/db_catasto/regione_toscana/adt_toscana.sqlite'
+    #DATA 'select PKUID,BELFIORE,ZONA_CENS,FOGLIO,ALLEGATO,SVILUPPO,SIGLAPROV,CODCOM,COMUNE,DTSCA,DTELAB,GEOMETRY from STRADE'
+    DATA 'STRADE'
+    PROJECTION
+      "init=epsg:3003"
+    END
+    METADATA
+      "wms_title" "Strade - AdT Catasto Terreni"
+      "wms_abstract" "Scala di visibilita 1:1 - 1:500.000. Dataset 'strade' proveniente dal Catasto Terreni dell' Agenzia del Territorio. Territorio coperto: intera regione"
+      "wms_abstract.ita" "Scala di visibilita 1:1 - 1:500.000. Dataset 'strade' proveniente dal Catasto Terreni dell' Agenzia del Territorio. Territorio coperto: intera regione"
+      "wms_keywordlist" "toscana,catasto,strade"
+      "wms_extent" "1553037 4673981 1775500 4927805"
+      #  "wms_srs" "EPSG:25832 EPSG:3003 EPSG:4326"
+      "wms_bbox_extended" "true"
+      "ows_include_items" "all"
+    END
+    MAXSCALEDENOM 500100
+    MINSCALEDENOM 1
+    OPACITY 100
+    PROCESSING "APPROXIMATION_SCALE=FULL"
+    CLASS
+      NAME 'strade'
+      STYLE
+         WIDTH 1.0
+         OUTLINECOLOR 200 200 200
+         ANTIALIAS false
+         OPACITY 100
+      END
+      STYLE
+         COLOR 200 200 200
+         ANTIALIAS false
+         OPACITY 40
+      END
+    END
+  END
+#-----
+#========= init FABBRICATI ===
+# fabbricati - RT
+  LAYER 
+    NAME "rt_cat.idcatfabbr.rt"
+    STATUS OFF
+    TYPE POLYGON
+    CONNECTIONTYPE OGR
+    CONNECTION '/home/vector/vettoriali/db_catasto/regione_toscana/adt_toscana.sqlite'
+    DATA 'FABBRICATI'
+    #DATA 'select PKUID,CODICE,DIM,ANG,POSX,POSY,PINTX,PINTY,BELFIORE,ZONA_CENS,FOGLIO,ALLEGATO,SVILUPPO,SIGLAPROV,CODCOM,COMUNE,DTSCA,DTELAB,GEOMETRY from FABBRICATI'
+    PROJECTION
+      "init=epsg:3003"
+    END
+    METADATA
+      "wms_title" "Fabbricati - AdT Catasto Terreni"
+      "wms_abstract" "Scala di visibilita 1:1 - 1:50.000. Dataset 'fabbricati' proveniente dal Catasto Terreni dell' Agenzia del Territorio. Territorio coperto: intera regione"
+      "wms_abstract.ita" "Scala di visibilita 1:1 - 1:50.000. Dataset 'fabbricati' proveniente dal Catasto Terreni dell' Agenzia del Territorio. Territorio coperto: intera regione"
+      "wms_keywordlist" "toscana,catasto,fabbricati"
+      "wms_extent" "1553037 4673981 1775500 4927805"
+      #  "wms_srs" "EPSG:25832 EPSG:3003 EPSG:4326"
+      "wms_bbox_extended" "true"
+      "ows_include_items" "all"
+    END
+    MAXSCALEDENOM 50100
+    MINSCALEDENOM 1
+    OPACITY 100
+    PROCESSING "APPROXIMATION_SCALE=FULL"
+    CLASS
+      NAME 'fabbricati'
+      STYLE
+         WIDTH 1.0
+         OUTLINECOLOR 252 174 132
+         ANTIALIAS false
+         OPACITY 100
+      END
+      STYLE
+         COLOR 252 174 132
+         ANTIALIAS false
+         OPACITY 50
+      END
+    END
+  END
+#-----
+#========= init FOGLI CATASTALI ===
+# fogli catastali - RT
+  LAYER 
+    NAME "rt_cat.idcatbdfog.rt"
+    STATUS OFF
+    TYPE POLYGON
+    CONNECTIONTYPE OGR
+    CONNECTION '/home/vector/vettoriali/db_catasto/regione_toscana/adt_toscana.sqlite'
+    DATA "SELECT PKUID,BELFIORE,CODCOM,COMUNE,SIGLAPROV,ZONA_CENS,FOGLIO,DTELAB,GEOMETRY FROM FOGLI"
+    DUMP TRUE
+    PROJECTION
+      "+init=epsg:3003 +towgs84=0,0,0,0,0,0,0"
+    END
+    METADATA
+      "wms_title" "Fogli catastali - AdT Catasto Terreni"
+      "wms_abstract" "Scala di visibilita 1:1 - 1:300.000. Dataset 'bordi foglio catastali' proveniente dal Catasto Terreni dell' Agenzia del Territorio. Territorio coperto: intera regione"
+      "wms_abstract.ita" "Scala di visibilita 1:1 - 1:300.000. Dataset 'bordi foglio catastali' proveniente dal Catasto Terreni dell' Agenzia del Territorio. Territorio coperto: intera regione"
+      "wms_keywordlist" "toscana,catasto,foglio"
+      "wms_extent" "1553037 4673981 1775500 4927805"
+      #  "wms_srs" "EPSG:25832 EPSG:3003 EPSG:4326"
+      "wms_bbox_extended" "true"
+      "ows_enable_request" "*" #  !GetFeature"  # metteci !GetFeature per bloccare la GetFeature
+      "ows_include_items" "all"  # necessario per esportare tutti gli attributi in una GetFeatureInfo di tipo text/plain (per l'html basta il template sul template_driven)
+      # "wms_layer_group" "/Fogli catastali - AdT Catasto Terreni"
+      "gml_include_items" "all"
+      "gml_geometries" "GEOMETRY"
+      "gml_geometry_type" "multipolygon"
+      "gml_types"   "none"
+      "gml_PKUID_type" "int"
+      "wms_getfeatureinfo_formatlist" "OGRGML" # necessario per recuperare il GML da OGR-GDAL con GetFeatureInfo
+      # esperimento di inserimento lista stili
+#      "wms_style"
+    END
+    TEMPLATE 'ogrgml'  #con l'opzione void rimando al tipo output (template-driven)
+    MAXSCALEDENOM 300100
+    MINSCALEDENOM 1
+    OPACITY 100
+    PROCESSING "APPROXIMATION_SCALE=FULL"
+    CLASSGROUP "default"
+    CLASS
+      NAME 'bordi foglio'
+      GROUP 'default'
+      MAXSCALEDENOM 500100
+      MINSCALEDENOM 15100
+      STYLE
+         WIDTH 2.0
+         OUTLINECOLOR 224 116 216
+         ANTIALIAS false
+         OPACITY 100
+      END
+      TEXT '[FOGLIO]'
+      LABEL
+        COLOR 0 0 254
+        OUTLINECOLOR 244 238 157
+        OUTLINEWIDTH 1
+        MAXSCALEDENOM 200100
+        MINSCALEDENOM 15100
+        FONT "LiberationSans-Regular"
+        TYPE truetype
+        SIZE 8
+        ANGLE 0
+        STYLE
+          GEOMTRANSFORM 'labelpnt'
+          COLOR 255 0 0
+          OFFSET 3 2
+        END # STYLE
+        POSITION cc
+        PRIORITY 10
+        MAXOVERLAPANGLE 180.0
+        BUFFER 10
+        FORCE ON
+        PARTIALS TRUE
+      END
+    END
+    CLASS
+      NAME 'bordi foglio'
+      GROUP 'alternative'
+      MAXSCALEDENOM 500100
+      MINSCALEDENOM 15100
+      STYLE
+         WIDTH 2.0
+         COLOR 224 116 216
+         OUTLINECOLOR 0 0 0
+         ANTIALIAS false
+         OPACITY 30
+      END
+      TEXT '[FOGLIO]'
+      LABEL
+        COLOR 0 0 254
+        OUTLINECOLOR 244 238 157
+        OUTLINEWIDTH 1
+        MAXSCALEDENOM 200100
+        MINSCALEDENOM 15100
+        FONT "LiberationSans-Regular"
+        TYPE truetype
+        SIZE 8
+        ANGLE 0
+        STYLE
+          GEOMTRANSFORM 'labelpnt'
+          COLOR 255 0 0
+          OFFSET 3 2
+        END # STYLE
+        POSITION cc
+        PRIORITY 10
+        MAXOVERLAPANGLE 180.0
+        BUFFER 10
+        FORCE ON
+        PARTIALS TRUE
+      END
+    END
+    CLASS
+      NAME 'bordi foglio'
+      GROUP 'default'
+      MAXSCALEDENOM 15100
+      MINSCALEDENOM 1
+      STYLE
+         WIDTH 3.0
+         OUTLINECOLOR 224 116 216
+         ANTIALIAS false
+         OPACITY 100
+      END
+      TEXT '[FOGLIO]'
+      LABEL
+        COLOR 0 0 254
+        OUTLINECOLOR 244 238 157
+        OUTLINEWIDTH 1
+        MAXSCALEDENOM 15100
+        MINSCALEDENOM 1
+        FONT "LiberationSans-Regular"
+        TYPE truetype
+        SIZE 14
+        ANGLE 0
+        STYLE
+          GEOMTRANSFORM 'labelpnt'
+          COLOR 255 0 0
+          OFFSET 3 2
+        END # STYLE
+        POSITION cc
+        PRIORITY 10
+        MAXOVERLAPANGLE 180.0
+        BUFFER 10
+        FORCE ON
+        PARTIALS TRUE
+      END
+    END
+    CLASS
+      NAME 'bordi foglio'
+      GROUP 'alternative'
+      MAXSCALEDENOM 15100
+      MINSCALEDENOM 1
+      STYLE
+         WIDTH 3.0
+         COLOR 224 116 216
+         OUTLINECOLOR 0 0 0
+         ANTIALIAS false
+         OPACITY 30
+      END
+      TEXT '[FOGLIO]'
+      LABEL
+        COLOR 0 0 254
+        OUTLINECOLOR 244 238 157
+        OUTLINEWIDTH 1
+        MAXSCALEDENOM 15100
+        MINSCALEDENOM 1
+        FONT "LiberationSans-Regular"
+        TYPE truetype
+        SIZE 14
+        ANGLE 0
+        STYLE
+          GEOMTRANSFORM 'labelpnt'
+          COLOR 255 0 0
+          OFFSET 3 2
+        END # STYLE
+        POSITION cc
+        PRIORITY 10
+        MAXOVERLAPANGLE 180.0
+        BUFFER 10
+        FORCE ON
+        PARTIALS TRUE
+      END
+    END
+  END
+#-----
+#========= init PARTICELLE CATASTALI ===
+# particelle catastali - RT
+  LAYER 
+    NAME "rt_cat.idcatpart.rt"
+    STATUS OFF
+    TYPE POLYGON
+    CONNECTIONTYPE OGR
+    CONNECTION "/home/vector/vettoriali/db_catasto/regione_toscana/adt_toscana.sqlite"
+    DATA "SELECT PKUID,PARTICELLA,DIM,ANG,POSX,POSY,PINTX,PINTY,SUP,BELFIORE,ZONA_CENS,FOGLIO,ALLEGATO,SVILUPPO,SIGLAPROV,CODCOM,COMUNE,DTSCA,DTELAB,GEOMETRY FROM PARTICELLE"
+    #FILTER "type = 'highway' and numlanes >= 4" 
+    #PROCESSING "CLOSE_CONNECTION=DEFER"
+    PROJECTION
+      "init=epsg:3003"
+    END
+    METADATA
+      "wms_title" "Particelle catastali - AdT Catasto Terreni"
+      "wms_abstract" "Scala di visibilita 1:1 - 1:15.000. Dataset 'particelle catastali' proveniente dal Catasto Terreni dell' Agenzia del Territorio. Territorio coperto: intera regione"
+      "wms_abstract.ita" "Scala di visibilita 1:1 - 1:15.000. Dataset 'particelle catastali' proveniente dal Catasto Terreni dell' Agenzia del Territorio. Territorio coperto: intera regione"
+      "wms_keywordlist" "toscana,catasto,particelle"
+      "wms_extent" "1553037 4673981 1775500 4927805"
+      #  "wms_srs" "EPSG:25832 EPSG:3003 EPSG:4326"
+      "wms_bbox_extended" "true"
+      "ows_enable_request" "* !GetFeature"  # metteci !GetFeature per bloccare la GetFeature
+      "ows_include_items" "all"  # necessario per esportare tutti gli attributi in una GetFeatureInfo di tipo text/plain (per l'html basta il template sul template_driven)
+      # "wms_layer_group" "/Fogli catastali - AdT Catasto Terreni"
+	"gml_include_items" "all"
+      "gml_geometries" "GEOMETRY"
+      "gml_geometry_type" "multipolygon"
+      "gml_types"   "none"
+      "gml_PK_UID_type" "int"
+      "wms_getfeatureinfo_formatlist" "OGRGML" # necessario per recuperare il GML da OGR-GDAL con GetFeatureInfo
+    END
+    TEMPLATE 'ogrgml'  #con l'opzione void rimando al tipo output (template-driven)
+    MAXSCALEDENOM 15100
+    MINSCALEDENOM 1
+    OPACITY 100
+    PROCESSING "APPROXIMATION_SCALE=FULL"
+    CLASS
+      NAME 'particella con etichette'
+      STYLE
+         WIDTH 1.0
+         OUTLINECOLOR 0 0 196
+         ANTIALIAS false
+         OPACITY 100
+      END
+      TEXT '[PARTICELLA]'
+      LABEL
+        COLOR 0 0 0
+        MAXSCALEDENOM 4100
+        MINSCALEDENOM 1
+        OUTLINECOLOR 244 238 157
+        OUTLINEWIDTH 2
+        FONT "LiberationSans-Regular"
+        TYPE truetype
+        SIZE 8
+        ANGLE 0
+        STYLE
+          GEOMTRANSFORM 'labelpnt'
+          COLOR 255 0 0
+          OFFSET 3 2
+        END # STYLE
+        POSITION cc
+        PRIORITY 10
+        MAXOVERLAPANGLE 180.0
+        BUFFER 10
+        FORCE ON
+        PARTIALS TRUE
+      END
+    END
+  END
+#-----
+#========= init TOPONOMI ===
+# toponomi catastali - RT
+  LAYER 
+    NAME "rt_cat.idcattopon.rt"
+    STATUS OFF
+    TYPE POINT
+    CONNECTIONTYPE OGR
+    CONNECTION "/home/vector/vettoriali/db_catasto/regione_toscana/adt_toscana.sqlite"
+    #DATA "SELECT PKUID,PARTICELLA,DIM,ANG,POSX,POSY,PINTX,PINTY,SUP,BELFIORE,ZONA_CENS,FOGLIO,ALLEGATO,SVILUPPO,SIGLAPROV,CODCOM,COMUNE,DTSCA,DTELAB,GEOMETRY FROM PARTICELLE"
+    #DATA 'TOPONOMI'
+    DATA "SELECT pkuid,id_top,esterconf,(dim * 3.0) as dim,ang,posx,posy,stringa,belfiore,zona_cens,foglio,allegato,sviluppo,siglaprov,codcom,comune,dtsca,geometry FROM toponomi"
+    #DATA "geometry from (SELECT pkuid,id_top,esterconf,dim,ang,posx,posy,stringa,belfiore,zona_cens,foglio,allegato,sviluppo,siglaprov,codcom,comune,dtsca,geometry FROM toponomi) as foo using unique pkuid using srid=3003"
+    #DATA "select pk_uid,id,CODBO,TIPO,SUP,BELFIORE,ZONA_CENS,FOGLIO,ALLEGATO,SVILUPPO,SIGLAPROV,CODCOM,COMUNE,DTSCA,GEOMETRY from particelle"
+    #FILTER "type = 'highway' and numlanes >= 4" 
+    #PROCESSING "CLOSE_CONNECTION=DEFER"
+    PROJECTION
+      "init=epsg:3003"
+    END
+    TEMPLATE 'void'  #con l'opzione void rimando al tipo output (template-driven)
+    METADATA
+      "wms_title" "Toponomi - AdT Catasto Terreni"
+      "wms_abstract" "Scala di visibilita 1:1 - 1:15.000. Dataset 'toponomi catastali' proveniente dal Catasto Terreni dell' Agenzia del Territorio. Territorio coperto: intera regione"
+      "wms_abstract.ita" "Scala di visibilita 1:1 - 1:15.000. Dataset 'toponomi catastali' proveniente dal Catasto Terreni dell' Agenzia del Territorio. Territorio coperto: intera regione"
+      "wms_keywordlist" "toscana,catasto,toponomi"
+      "wms_extent" "1553037 4673981 1775500 4927805"
+      #  "wms_srs" "EPSG:25832 EPSG:3003 EPSG:4326"
+      "wms_bbox_extended" "true"
+      "ows_include_items" "all"
+    END
+    MAXSCALEDENOM 15100
+    MINSCALEDENOM 1
+    OPACITY 100
+    PROCESSING "APPROXIMATION_SCALE=FULL"
+    SYMBOLSCALEDENOM 2000
+    CLASS
+      NAME 'toponomi'
+#      STYLE
+#        SYMBOL "simbtoponomi"
+#        WIDTH 1.0
+#        OUTLINECOLOR 0 0 196
+#        ANTIALIAS false
+#        OPACITY 100
+#      END
+      TEXT '[STRINGA]'
+      LABEL
+        COLOR 0 0 0
+        MAXSCALEDENOM 15100
+        MINSCALEDENOM 1
+#        MINSIZE 7
+#        MAXSIZE 40
+        OUTLINECOLOR 255 255 255 #244 238 157
+        OUTLINEWIDTH 1
+        FONT "LiberationSans-Regular"
+        TYPE truetype
+        SIZE [DIM]
+        ANGLE [ANG]
+#        STYLE
+#          SIZE [DIM]
+#          ANGLE [ANG]
+#          COLOR 0 0 0
+#        END
+        STYLE
+          GEOMTRANSFORM 'labelpnt'
+          COLOR 255 0 0
+          OFFSET 3 2
+        END # STYLE
+        POSITION ur
+        PRIORITY 10
+        MAXOVERLAPANGLE 180.0
+        BUFFER 10
+        FORCE ON
+        PARTIALS TRUE
+      END
+    END
+  END
+
+#======
+  # End of LAYER DEFINITIONS -------------------------------
+  # INCLUDE "layers.inc.map"
+END # Map File

@@ -1,0 +1,195 @@
+MAP
+  FONTSET "[fontsetpath]"
+  EXTENT 622967.920426134 4754268.3435669 623314.25648198 4754821.88922881
+  IMAGETYPE "png"
+  NAME "test"
+  SIZE 600 600
+  STATUS ON
+  UNITS METERS
+
+  OUTPUTFORMAT
+    NAME "png"
+    MIMETYPE "image/png"
+    DRIVER "AGG/PNG"
+    EXTENSION "png"
+    IMAGEMODE RGB
+    TRANSPARENT TRUE
+  END # OUTPUTFORMAT
+
+  SYMBOL
+    NAME "sld_mark_symbol_circle_filled"
+    TYPE ELLIPSE
+    FILLED TRUE
+    POINTS
+      1 1
+    END
+  END
+
+  SYMBOL
+    NAME "sld_mark_symbol_square_filled"
+    TYPE VECTOR
+    FILLED TRUE
+    POINTS
+      0 1
+      0 0
+      1 0
+      1 1
+      0 1
+    END
+  END
+
+  PROJECTION
+    "proj=utm"
+    "zone=18"
+    "ellps=GRS80"
+    "towgs84=0,0,0,0,0,0,0"
+    "units=m"
+    "no_defs"
+  END # PROJECTION
+  LEGEND
+    KEYSIZE 20 10
+    KEYSPACING 5 5
+    LABEL
+      SIZE MEDIUM
+      OFFSET 0 0
+      SHADOWSIZE 1 1
+      TYPE BITMAP
+    END # LABEL
+    STATUS OFF
+  END # LEGEND
+
+  QUERYMAP
+    SIZE -1 -1
+    STATUS OFF
+    STYLE HILITE
+  END # QUERYMAP
+
+  SCALEBAR
+    INTERVALS 4
+    LABEL
+      SIZE MEDIUM
+      OFFSET 0 0
+      SHADOWSIZE 1 1
+      TYPE BITMAP
+    END # LABEL
+    SIZE 200 3
+    STATUS OFF
+    UNITS MILES
+  END # SCALEBAR
+
+  WEB
+    FOOTER ""
+    HEADER ""
+    TEMPPATH ""
+    METADATA
+      "ows_onlineresource"	"http://localhost/cgi-bin/mapserv?map=/home/giuseppe/Downloads/spatial_data/rt_mapserver_exporter/test.map"
+      "ows_enable_request"	"*"
+      "ows_srs"	"EPSG:26918"
+      "ows_title"	"test"
+    END # METADATA
+    TEMPLATE "/home/giuseppe/Downloads/spatial_data/rt_mapserver_exporter/test.map.html.tmpl"
+  END # WEB
+
+  LAYER
+    DATA "/home/giuseppe/Downloads/spatial_data/rt_mapserver_exporter/flood/flood.shp"
+    EXTENT 622967.920426134 4754268.3435669 623314.25648198 4754821.88922881
+    LABELITEM "FLD_ZONE"
+    METADATA
+      "ows_title"	"flood"
+    END # METADATA
+    NAME "flood"
+    PROJECTION
+      "proj=utm"
+      "zone=18"
+      "ellps=GRS80"
+      "towgs84=0,0,0,0,0,0,0"
+      "units=m"
+      "no_defs"
+    END # PROJECTION
+    STATUS ON
+    TILEITEM "location"
+    TYPE POINT
+    UNITS METERS
+    CLASS
+      NAME "0.2 PCT ANNUAL CHANCE"
+      EXPRESSION ("[FLD_ZONE]" ="0.2 PCT ANNUAL CHANCE FLOOD HAZARD")
+      STYLE
+        COLOR 255 128 0
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 0 0 0
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "Approximate"
+      EXPRESSION ("[FLD_ZONE]" ="A")
+      STYLE
+        COLOR 0 230 255
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 0 0 0
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "AE"
+      EXPRESSION ("[FLD_ZONE]" ="AE")
+      STYLE
+        COLOR 0 0 0
+        WIDTH 0.26
+      END # STYLE
+      STYLE
+        COLOR 0 230 255
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 0 0 0
+        WIDTH 0.26
+      END # STYLE
+      STYLE
+        COLOR 128 128 128
+        SIZE 4
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "AE, FLOODWAY"
+      EXPRESSION ("[ZONE_SUBTY]" ="FLOODWAY")
+      MAXSCALEDENOM 10000
+      MINSCALEDENOM 1000
+      STYLE
+        COLOR 0 0 255
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 0 0 0
+        WIDTH 0.26
+      END # STYLE
+      STYLE
+        COLOR 255 0 0
+        OUTLINECOLOR 0 0 0
+        SIZE 2
+        SYMBOL "sld_mark_symbol_circle_filled"
+      END # STYLE
+      STYLE
+        COLOR 0 0 0
+        OFFSET 0 -2
+        SIZE 10
+        SYMBOL "sld_mark_symbol_square_filled"
+      END # STYLE
+    END # CLASS
+    CLASS
+      LABEL
+        ANTIALIAS TRUE
+        FONT "Ubuntu-BoldItalic"
+        SIZE 15
+        BUFFER 1
+        COLOR 170 85 255
+        OFFSET 0 0
+        POSITION CC
+        PRIORITY 5
+        SHADOWSIZE 1 1
+        TYPE TRUETYPE
+      END # LABEL
+    END # CLASS
+  END # LAYER
+
+END # MAP
