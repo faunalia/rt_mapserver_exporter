@@ -503,7 +503,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
 
             if orientation == Qt.Horizontal:
                 tmpl += '  <tr class="idtmplt_trclass_1h">\n'
-                for idx, fld in layer.dataProvider().fields().iteritems():
+                for idx, fld in enumerate(layer.dataProvider().fields()):
                     fldDescr = fld.comment() if fld.comment() != "" else fld.name()
                     tmpl += u'    <td class="idtmplt_tdclass_1h">"%s"</td>\n' % fldDescr
                 tmpl += '</tr>\n'
@@ -511,7 +511,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
                 tmpl += '[feature limit=20]\n'
 
                 tmpl += '  <tr class="idtmplt_trclass_2h">\n'
-                for idx, fld in layer.dataProvider().fields().iteritems():
+                for idx, fld in enumerate(layer.dataProvider().fields()):
                     fldDescr = fld.comment() if fld.comment() != "" else fld.name()
                     tmpl += u'    <td class="idtmplt_tdclass_2h">[item name="%s"]</td>\n' % fld.name()
                 tmpl += '  </tr>\n'
@@ -519,7 +519,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
                 tmpl += '[/feature]\n'
 
             else:
-                for idx, fld in layer.dataProvider().fields().iteritems():
+                for idx, fld in enumerate(layer.dataProvider().fields()):
                     tmpl += '  <tr class="idtmplt_trclass_v">\n'
 
                     fldDescr = fld.comment() if fld.comment() != "" else fld.name()
@@ -586,7 +586,7 @@ class TemplateDelegate(QItemDelegate):
             cbo = QComboBox(parent)
             cbo.setEditable(False)
             cbo.setFrame(False)
-            for val, txt in TemplateModel.ORIENTATIONS.iteritems():
+            for val, txt in enumerate(TemplateModel.ORIENTATIONS):
                 cbo.addItem(txt, val)
             return cbo
         return QItemDelegate.createEditor(self, parent, option, index)
