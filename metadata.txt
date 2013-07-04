@@ -4,7 +4,7 @@ name=RT MapServer Exporter
 description=Export QGIS project to MapFile.
     Developed with funding from Regione Toscana-SITA.
 
-version=0.3.1
+version=0.3.2
 qgisMinimumVersion=2.0
 
 category=Plugin
