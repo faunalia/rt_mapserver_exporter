@@ -232,6 +232,11 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
         ms_map.setMetaData( "ows_enable_request", "*" )
 
         for layer in self.legend.layers():
+            # check if layer is a supported type... seems return None if type is not supported (e.g. csv)
+            if ( self.getLayerType( layer ) == None):
+                QMessageBox.warning(self, "RT MapServer Exporter", "Skipped not supported layer: %s" % layer.name())
+                continue
+            
             # create a layer object
             ms_layer = mapscript.layerObj( ms_map )
             ms_layer.name = _toUtf8( layer.name() )
