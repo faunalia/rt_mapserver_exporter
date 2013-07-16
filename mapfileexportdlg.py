@@ -330,7 +330,9 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
             # set layer style
             if layer.type() == QgsMapLayer.RasterLayer:
                 if hasattr(layer, 'renderer'):    # QGis >= 1.9
-                    opacity = layer.renderer().opacity()
+                    # layer.renderer().opacity() has range [0,1]
+                    # ms_layer.opacity has range [0,100] => scale!
+                    opacity = int( round(100 * layer.renderer().opacity()) )
                 else:
                     opacity = int( 100 * layer.getTransparency() / 255.0 )
                 ms_layer.opacity = opacity
