@@ -354,62 +354,62 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
                         QgsMessageLog.logMessage( u"Something went wrong applying the SLD style to the layer '%s'" % ms_layer.name, "RT MapServer Exporter" )
                     QFile.remove( tempSldPath )
 
-            # set layer labels
-            #XXX the following code MUST be removed when QGIS will
-            # have SLD label support
-            labelingEngine = self.canvas.mapRenderer().labelingEngine()
-            if labelingEngine and labelingEngine.willUseLayer( layer ):
-                palLayer = labelingEngine.layer( layer.id() )
-                if palLayer.enabled:
-                    if not palLayer.isExpression:
-                        ms_layer.labelitem = _toUtf8( palLayer.fieldName )
-                    else:
-                        #XXX expressions won't be supported until
-                        # QGIS have SLD label support
-                        pass
-
-                    if palLayer.scaleMin > 0:
-                        ms_layer.labelminscaledenom = palLayer.scaleMin
-                    if palLayer.scaleMax > 0:
-                        ms_layer.labelmaxscaledenom = palLayer.scaleMax
-
-                    ms_label = mapscript.labelObj()
-
-                    ms_label.type = mapscript.MS_TRUETYPE
-                    ms_label.antialias = mapscript.MS_TRUE
-
-                    ms_label.position = self.getLabelPosition( palLayer )
-                    # TODO: convert offset to pixels
-                    ms_label.offsetx = int( palLayer.xOffset )
-                    ms_label.offsety = int( palLayer.yOffset )
-                    ms_label.angle = palLayer.angleOffset
-
-                    # set label font name, size and color
-                    fontFamily = palLayer.textFont.family().replace(" ", "")
-                    fontStyle = palLayer.textNamedStyle.replace(" ", "")
-                    ms_label.font = _toUtf8( u"%s-%s" % (fontFamily, fontStyle) )
-                    if palLayer.textFont.pixelSize() > 0:
-                        ms_label.size = int( palLayer.textFont.pixelSize() )
-                    r,g,b,a = palLayer.textColor.getRgb()
-                    ms_label.color.setRGB( r, g, b )
-
-                    if palLayer.fontLimitPixelSize:
-                        ms_label.minsize = palLayer.fontMinPixelSize
-                        ms_label.maxsize = palLayer.fontMaxPixelSize
-                    ms_label.wrap = _toUtf8( palLayer.wrapChar )
-
-                    ms_label.priority = palLayer.priority
-
-                    # TODO: convert buffer size to pixels
-                    ms_label.buffer = int( palLayer.bufferSize )
-
-                    if int( palLayer.minFeatureSize ) > 0:
-                        # TODO: convert feature size from mm to pixels
-                        ms_label.minfeaturesize = int( palLayer.minFeatureSize )
-
-                    ms_class = mapscript.classObj()
-                    ms_class.addLabel( ms_label )
-                    ms_layer.insertClass( ms_class )
+                    # set layer labels
+                    #XXX the following code MUST be removed when QGIS will
+                    # have SLD label support
+                    labelingEngine = self.canvas.mapRenderer().labelingEngine()
+                    if labelingEngine and labelingEngine.willUseLayer( layer ):
+                        palLayer = labelingEngine.layer( layer.id() )
+                        if palLayer.enabled:
+                            if not palLayer.isExpression:
+                                ms_layer.labelitem = _toUtf8( palLayer.fieldName )
+                            else:
+                                #XXX expressions won't be supported until
+                                # QGIS have SLD label support
+                                pass
+        
+                            if palLayer.scaleMin > 0:
+                                ms_layer.labelminscaledenom = palLayer.scaleMin
+                            if palLayer.scaleMax > 0:
+                                ms_layer.labelmaxscaledenom = palLayer.scaleMax
+        
+                            ms_label = mapscript.labelObj()
+        
+                            ms_label.type = mapscript.MS_TRUETYPE
+                            ms_label.antialias = mapscript.MS_TRUE
+        
+                            ms_label.position = self.getLabelPosition( palLayer )
+                            # TODO: convert offset to pixels
+                            ms_label.offsetx = int( palLayer.xOffset )
+                            ms_label.offsety = int( palLayer.yOffset )
+                            ms_label.angle = palLayer.angleOffset
+        
+                            # set label font name, size and color
+                            fontFamily = palLayer.textFont.family().replace(" ", "")
+                            fontStyle = palLayer.textNamedStyle.replace(" ", "")
+                            ms_label.font = _toUtf8( u"%s-%s" % (fontFamily, fontStyle) )
+                            if palLayer.textFont.pixelSize() > 0:
+                                ms_label.size = int( palLayer.textFont.pixelSize() )
+                            r,g,b,a = palLayer.textColor.getRgb()
+                            ms_label.color.setRGB( r, g, b )
+        
+                            if palLayer.fontLimitPixelSize:
+                                ms_label.minsize = palLayer.fontMinPixelSize
+                                ms_label.maxsize = palLayer.fontMaxPixelSize
+                            ms_label.wrap = _toUtf8( palLayer.wrapChar )
+        
+                            ms_label.priority = palLayer.priority
+        
+                            # TODO: convert buffer size to pixels
+                            ms_label.buffer = int( palLayer.bufferSize )
+        
+                            if int( palLayer.minFeatureSize ) > 0:
+                                # TODO: convert feature size from mm to pixels
+                                ms_label.minfeaturesize = int( palLayer.minFeatureSize )
+        
+                            ms_class = mapscript.classObj()
+                            ms_class.addLabel( ms_label )
+                            ms_layer.insertClass( ms_class )
 
 
         # save the map file now!
