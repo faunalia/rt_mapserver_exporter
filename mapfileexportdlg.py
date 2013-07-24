@@ -273,18 +273,16 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
 
             elif layer.providerType() == 'wms':
                 ms_layer.setConnectionType( mapscript.MS_WMS, "" )
-                if hasattr(QgsDataSourceURI, 'paramValue'):
-                    uri = QgsDataSourceURI( layer.source() )
-                else:
-                    uri = QUrl( layer.source() )
-                    uri.paramValue = uri.queryItemValue # forward to the QUrl method
-                ms_layer.connection = _toUtf8( uri.paramValue("url") )
+
+                uri = QUrl( "http://www.fake.eu/?"+layer.source() )
+                ms_layer.connection = _toUtf8( uri.queryItemValue("url") )
 
                 # loop thru wms sub layers
-                names = []
-                styles = []
-                wmsLayerNames = uri.paramValues("layers")
-                wmsLayerStyles = uri.paramValues("styles")
+                wmsNames = []
+                wmsStyles = []
+                wmsLayerNames = layer.dataProvider().subLayers()
+                wmsLayerStyles = layer.dataProvider().subLayerStyles()
+                
                 for index in range(len(wmsLayerNames)):
                     wmsNames.append( _toUtf8( wmsLayerNames[index] ) )
                     wmsStyles.append( _toUtf8( wmsLayerStyles[index] ) )
