@@ -421,10 +421,17 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
         # the QGIS client used to generate the mafile.
 
         # get the mapfile content as string so we can manipulate on it
-        with open( unicode(self.txtMapFilePath.text()), 'r' ) as fin:
-            # parts holds the content lines
-            parts = fin.read().split(u"\n")
-            
+        mesg = "Reload Map file %s to manipulate it" % self.txtMapFilePath
+        QgsMessageLog.logMessage( mesg, "RT MapServer Exporter" )
+        fin = open( unicode(self.txtMapFilePath.text()), 'r' )
+        parts = []
+        line = fin.readline()
+        while line != "":
+            line = line.rstrip('\n')
+            parts.append(line)
+            line = fin.readline()
+        fin.close()
+        
         partsContentChanged = False
 
         # retrieve the list of used font aliases searching for FONT keywords
