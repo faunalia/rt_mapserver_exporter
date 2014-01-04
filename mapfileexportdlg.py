@@ -421,7 +421,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
         # the QGIS client used to generate the mafile.
 
         # get the mapfile content as string so we can manipulate on it
-        mesg = "Reload Map file %s to manipulate it" % self.txtMapFilePath
+        mesg = "Reload Map file %s to manipulate it" % self.txtMapFilePath.text()
         QgsMessageLog.logMessage( mesg, "RT MapServer Exporter" )
         fin = open( unicode(self.txtMapFilePath.text()), 'r' )
         parts = []
