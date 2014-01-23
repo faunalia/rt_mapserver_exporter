@@ -341,13 +341,15 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
                 tempSldFile.open()
                 tempSldPath = tempSldFile.fileName()
                 tempSldFile.close()
-
+                
                 # export the QGIS layer style to SLD file
                 errMsg, ok = layer.saveSldStyle( tempSldPath )
                 if not ok:
                     QgsMessageLog.logMessage( errMsg, "RT MapServer Exporter" )
                 else:
                     # set the mapserver layer style from the SLD file
+                    #QFile.copy(tempSldPath, tempSldPath+".save")
+                    #print "SLD saved file: ", tempSldPath+".save"
                     with open( unicode(tempSldPath), 'r' ) as fin:
                         sldContents = fin.read()
                     if mapscript.MS_SUCCESS != ms_layer.applySLD( sldContents, ms_layer.name ):
@@ -423,7 +425,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
         # get the mapfile content as string so we can manipulate on it
         mesg = "Reload Map file %s to manipulate it" % self.txtMapFilePath.text()
         QgsMessageLog.logMessage( mesg, "RT MapServer Exporter" )
-        fin = open( unicode(self.txtMapFilePath.text()), 'r' )
+        fin = open( _toUtf8(self.txtMapFilePath.text()), 'r' )
         parts = []
         line = fin.readline()
         while line != "":
@@ -459,7 +461,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
         # create the file containing the list of font aliases used in the
         # mapfile
         if self.checkCreateFontFile.isChecked():
-            fontPath = QFileInfo(self.txtMapFilePath.text()).dir().filePath(u"fonts.txt")
+            fontPath = QFileInfo(_toUtf8(self.txtMapFilePath.text())).dir().filePath(u"fonts.txt")
             with open( unicode(fontPath), 'w' ) as fout:
                 for fontAlias in fonts:
                     fout.write( unicode(fontAlias) )
@@ -476,8 +478,9 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
 
         # if mapfile content changed, store the file again at the same path
         if partsContentChanged:
-            with open( unicode(self.txtMapFilePath.text()), 'w' ) as fout:
-                fout.write( unicode( "\n".join(part for part in parts) ) )
+            with open( _toUtf8(self.txtMapFilePath.text()), 'w' ) as fout:
+                for part in parts:
+                    fout.write( part+"\n" )
 
         # XXX for debugging only: let's have a look at the map result! :)
         # XXX it works whether the file pointed by the fontset contains ALL the
