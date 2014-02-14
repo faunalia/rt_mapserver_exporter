@@ -469,12 +469,12 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
         # add the FONTSET keyword with the associated path
         if self.txtMapFontsetPath.text() != "":
             # get the index of the first instance of MAP string in the list
-            pos = parts.index( filter(lambda x: re.compile("^MAP$").match(x), parts)[0] )
+            pos = parts.index( filter(lambda x: re.compile("^MAP(\r\n|\r|\n)$").match(x), parts)[0] )
             if pos >= 0:
                 parts.insert( pos+1, u'  FONTSET "%s"' % self.txtMapFontsetPath.text() )
                 partsContentChanged = True
             else:
-                QgsMessageLog.logMessage( u"'FONTSET' keyword not added to the mapfile: unable to locate the 'WEB' keyword...", "RT MapServer Exporter" )
+                QgsMessageLog.logMessage( u"'FONTSET' keyword not added to the mapfile: unable to locate the 'MAP' keyword...", "RT MapServer Exporter" )
 
         # if mapfile content changed, store the file again at the same path
         if partsContentChanged:
