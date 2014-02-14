@@ -4,7 +4,7 @@ name=RT MapServer Exporter
 description=Export QGIS project to MapFile.
     Developed with funding from Regione Toscana-SITA.
 
-version=0.3.7
+version=0.3.8
 qgisMinimumVersion=2.0
 
 category=Plugin
@@ -16,7 +16,9 @@ email=sucameli@faunalia.it
 
 ; start of optional metadata
 
-changelog=0.3.7
+changelog=0.3.8
+	generalised regular expression adding end of lines
+	0.3.7
 	unicode bug fix - tiket: http://hub.qgis.org/issues/8362
 	0.3.6
 	solved bug on unicode encoding reading back produced map file
