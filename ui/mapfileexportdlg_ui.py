@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/mnt/data/PROGRAMMING/FAUNALIA/qgis-plugins/rt_mapserver_exporter/ui/mapfileexportdlg.ui'
 #
-# Created: Wed Jul 24 18:36:16 2013
+# Created: Fri Mar 28 09:55:24 2014
 #      by: PyQt4 UI code generator 4.9.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -17,7 +17,7 @@ except AttributeError:
 class Ui_MapfileExportDlg(object):
     def setupUi(self, MapfileExportDlg):
         MapfileExportDlg.setObjectName(_fromUtf8("MapfileExportDlg"))
-        MapfileExportDlg.resize(547, 439)
+        MapfileExportDlg.resize(547, 483)
         MapfileExportDlg.setSizeGripEnabled(True)
         self.gridLayout = QtGui.QGridLayout(MapfileExportDlg)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
@@ -135,6 +135,16 @@ class Ui_MapfileExportDlg(object):
         self.label6_4.setMinimumSize(QtCore.QSize(80, 0))
         self.label6_4.setObjectName(_fromUtf8("label6_4"))
         self.gridLayout_4.addWidget(self.label6_4, 3, 0, 1, 1)
+        self.label6_7 = QtGui.QLabel(self.groupBox_2)
+        self.label6_7.setMinimumSize(QtCore.QSize(80, 0))
+        self.label6_7.setToolTip(_fromUtf8(""))
+        self.label6_7.setObjectName(_fromUtf8("label6_7"))
+        self.gridLayout_4.addWidget(self.label6_7, 4, 0, 1, 1)
+        self.txtExternalGraphicRegexp = QtGui.QLineEdit(self.groupBox_2)
+        self.txtExternalGraphicRegexp.setToolTip(_fromUtf8(""))
+        self.txtExternalGraphicRegexp.setText(_fromUtf8(""))
+        self.txtExternalGraphicRegexp.setObjectName(_fromUtf8("txtExternalGraphicRegexp"))
+        self.gridLayout_4.addWidget(self.txtExternalGraphicRegexp, 4, 1, 1, 1)
         self.label6_6 = QtGui.QLabel(self.groupBox_2)
         self.label6_6.setMinimumSize(QtCore.QSize(80, 0))
         self.label6_6.setObjectName(_fromUtf8("label6_6"))
@@ -254,6 +264,7 @@ class Ui_MapfileExportDlg(object):
         self.label6.setBuddy(self.txtMapServerUrl)
         self.label6_5.setBuddy(self.txtMapServerUrl)
         self.label6_4.setBuddy(self.txtMapServerUrl)
+        self.label6_7.setBuddy(self.txtMapServerUrl)
         self.label6_6.setBuddy(self.txtMapServerUrl)
         self.label6_3.setBuddy(self.txtMapServerUrl)
 
@@ -293,6 +304,7 @@ class Ui_MapfileExportDlg(object):
         self.label6_5.setText(QtGui.QApplication.translate("MapfileExportDlg", "Image path", None, QtGui.QApplication.UnicodeUTF8))
         self.txtWebImagePath.setToolTip(QtGui.QApplication.translate("MapfileExportDlg", "Path to the temporary directory for writing temporary files and images. Must be writable by the user the web server is running as. Must end with a / or depending on your platform.", None, QtGui.QApplication.UnicodeUTF8))
         self.label6_4.setText(QtGui.QApplication.translate("MapfileExportDlg", "Temporary path", None, QtGui.QApplication.UnicodeUTF8))
+        self.label6_7.setText(QtGui.QApplication.translate("MapfileExportDlg", "External graphic regexp", None, QtGui.QApplication.UnicodeUTF8))
         self.label6_6.setText(QtGui.QApplication.translate("MapfileExportDlg", "Image URL", None, QtGui.QApplication.UnicodeUTF8))
         self.txtWebImageUrl.setToolTip(QtGui.QApplication.translate("MapfileExportDlg", "Base URL for \"Image path\".\n"
 "This is the URL that will take the web browser to \"Image path\" to get the images.", None, QtGui.QApplication.UnicodeUTF8))

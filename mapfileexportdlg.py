@@ -217,6 +217,12 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
         ms_map.web.imagepath = _toUtf8( self.getWebImagePath() )
         ms_map.web.imageurl = _toUtf8( self.getWebImageUrl() )
         ms_map.web.temppath = _toUtf8( self.getWebTemporaryPath() )
+        # add validation block if set a regexp
+        # no control on regexp => it will be done by mapscript applySld
+        # generating error in case regexp is wrong
+        validationRegexp = _toUtf8( self.getExternalGraphicRegexp() )
+        if validationRegexp != "":
+            ms_map.web.validation.set("sld_external_graphic", validationRegexp)
 
         # web template
         ms_map.web.template = _toUtf8( self.getTemplatePath() )
@@ -590,6 +596,9 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
 
     def getWebTemporaryPath(self):
         return self.txtWebTempPath.text() #"/tmp/"
+
+    def getExternalGraphicRegexp(self):
+        return self.txtExternalGraphicRegexp.text()
 
 
 class TemplateDelegate(QItemDelegate):
