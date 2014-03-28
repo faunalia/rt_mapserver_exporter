@@ -89,7 +89,7 @@ clean:
 package: all
 	@cd $(OUT_DIR)/../ && \
 	rm -f $(PLUGIN_NAME).zip && \
-	zip -qr $(PLUGIN_NAME).zip $(PLUGIN_NAME) -x \*.svn* -x \*.pyc -x \*~ -x \*entries\* -x \*.git\* -x \*.skip\*
+	zip -qr $(PLUGIN_NAME).zip $(PLUGIN_NAME) -x \*.svn* -x \*.pyc -x \*~ -x \*entries\* -x \*.git\* -x \*.skip\* -x \*.settings\* -x \*.project\*
 	@echo ">>> DONE: Package \"$(abspath $(OUT_DIR)/../)/$(PLUGIN_NAME).zip\" created."
 	@cd $(CURDIR)
 
