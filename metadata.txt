@@ -41,3 +41,14 @@ icon=icons/logo.png
 
 experimental=True
 deprecated=False
+
+# about
+about=This plugin helps to export a QGis Project as mapserver mapfile.
+	It sets main class, layer and symbols with some limitation.
+	Internally It uses SLD as interchange format among QGIS and Mapserver/Mapscript adding some more features where not covered by the interchange format transformation.
+	!!!WARNING!!!
+	In 0.4.0 was added SLD external graphic validation regexp. If you plan to add any external graphics (svg or pixmap) you MUST set a validation regexp otherwise you'll receive mapscript validation error.
+	Tis will work only if your mapscript version supports sld_external_graphic validation.
+	sld_external_graphic validation block is managed by mapserver in curent master version and will be officially released in mapserver 7.0.
+
+
