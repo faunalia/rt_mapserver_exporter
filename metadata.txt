@@ -10,7 +10,7 @@ qgisMinimumVersion=2.0
 category=Plugin
 
 author=Giuseppe Sucameli (Faunalia)
-email=sucameli@faunalia.it
+email=info@faunalia.eu
 
 ; end of mandatory metadata
 
@@ -32,7 +32,7 @@ changelog=0.4.0
 ; tags are in comma separated value format, spaces are allowed
 tags=export, project, mapserver, mapfile
 
-homepage=http://www.faunalia.com/
+homepage=http://www.faunalia.eu/
 tracker=http://hub.qgis.org/projects/rtmapserverexporter
 repository=https://github.com/faunalia/rt_mapserver_exporter
 
@@ -48,7 +48,7 @@ about=This plugin helps to export a QGis Project as mapserver mapfile.
 	Internally It uses SLD as interchange format among QGIS and Mapserver/Mapscript adding some more features where not covered by the interchange format transformation.
 	!!!WARNING!!!
 	In 0.4.0 was added SLD external graphic validation regexp. If you plan to add any external graphics (svg or pixmap) you MUST set a validation regexp otherwise you'll receive mapscript validation error.
-	Tis will work only if your mapscript version supports sld_external_graphic validation.
+	This will work only if your mapscript version supports sld_external_graphic validation.
 	sld_external_graphic validation block is managed by mapserver in curent master version and will be officially released in mapserver 7.0.
 
 
