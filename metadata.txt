@@ -9,7 +9,7 @@ qgisMinimumVersion=2.0
 
 category=Plugin
 
-author=Giuseppe Sucameli (Faunalia)
+author=Giuseppe Sucameli - Luigi Pirelli (Faunalia)
 email=info@faunalia.eu
 
 ; end of mandatory metadata
