@@ -44,6 +44,8 @@ deprecated=False
 
 # about
 about=This plugin helps to export a QGis Project as mapserver mapfile.
+	It needs python-mapscript istalled in your machine.
+	This is available as a Debian (therefore Ubuntu) package, and as a part of OSGeo4W on Windows.
 	It sets main class, layer and symbols with some limitation.
 	Internally It uses SLD as interchange format among QGIS and Mapserver/Mapscript adding some more features where not covered by the interchange format transformation.
 	!!!WARNING!!!
