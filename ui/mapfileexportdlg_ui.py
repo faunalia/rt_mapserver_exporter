@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/mnt/data/PROGRAMMING/FAUNALIA/qgis-plugins/rt_mapserver_exporter/ui/mapfileexportdlg.ui'
+# Form implementation generated from reading ui file '/data/dev/rt_mapserver_exporter/ui/mapfileexportdlg.ui'
 #
-# Created: Fri Mar 28 09:55:24 2014
-#      by: PyQt4 UI code generator 4.9.3
+# Created by: PyQt4 UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -12,7 +11,16 @@ from PyQt4 import QtCore, QtGui
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
-    _fromUtf8 = lambda s: s
+    def _fromUtf8(s):
+        return s
+
+try:
+    _encoding = QtGui.QApplication.UnicodeUTF8
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+except AttributeError:
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig)
 
 class Ui_MapfileExportDlg(object):
     def setupUi(self, MapfileExportDlg):
@@ -20,6 +28,8 @@ class Ui_MapfileExportDlg(object):
         MapfileExportDlg.resize(547, 483)
         MapfileExportDlg.setSizeGripEnabled(True)
         self.gridLayout = QtGui.QGridLayout(MapfileExportDlg)
+        self.gridLayout.setMargin(11)
+        self.gridLayout.setSpacing(6)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.buttonBox = QtGui.QDialogButtonBox(MapfileExportDlg)
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Help|QtGui.QDialogButtonBox.Ok)
@@ -35,6 +45,8 @@ class Ui_MapfileExportDlg(object):
         self.tab = QtGui.QWidget()
         self.tab.setObjectName(_fromUtf8("tab"))
         self.gridLayout_3 = QtGui.QGridLayout(self.tab)
+        self.gridLayout_3.setMargin(11)
+        self.gridLayout_3.setSpacing(6)
         self.gridLayout_3.setObjectName(_fromUtf8("gridLayout_3"))
         self.btnChooseFile = QtGui.QToolButton(self.tab)
         self.btnChooseFile.setObjectName(_fromUtf8("btnChooseFile"))
@@ -56,6 +68,8 @@ class Ui_MapfileExportDlg(object):
         self.grpMap.setSizePolicy(sizePolicy)
         self.grpMap.setObjectName(_fromUtf8("grpMap"))
         self.gridLayout_2 = QtGui.QGridLayout(self.grpMap)
+        self.gridLayout_2.setMargin(11)
+        self.gridLayout_2.setSpacing(6)
         self.gridLayout_2.setObjectName(_fromUtf8("gridLayout_2"))
         self.label1 = QtGui.QLabel(self.grpMap)
         self.label1.setToolTip(_fromUtf8(""))
@@ -114,6 +128,8 @@ class Ui_MapfileExportDlg(object):
         self.groupBox_2.setSizePolicy(sizePolicy)
         self.groupBox_2.setObjectName(_fromUtf8("groupBox_2"))
         self.gridLayout_4 = QtGui.QGridLayout(self.groupBox_2)
+        self.gridLayout_4.setMargin(11)
+        self.gridLayout_4.setSpacing(6)
         self.gridLayout_4.setObjectName(_fromUtf8("gridLayout_4"))
         self.label6 = QtGui.QLabel(self.groupBox_2)
         self.label6.setMinimumSize(QtCore.QSize(80, 0))
@@ -163,6 +179,8 @@ class Ui_MapfileExportDlg(object):
         self.tab_2 = QtGui.QWidget()
         self.tab_2.setObjectName(_fromUtf8("tab_2"))
         self.gridLayout_7 = QtGui.QGridLayout(self.tab_2)
+        self.gridLayout_7.setMargin(11)
+        self.gridLayout_7.setSpacing(6)
         self.gridLayout_7.setObjectName(_fromUtf8("gridLayout_7"))
         self.checkTmplFromFile = QtGui.QRadioButton(self.tab_2)
         self.checkTmplFromFile.setChecked(True)
@@ -210,6 +228,8 @@ class Ui_MapfileExportDlg(object):
         self.tab_3 = QtGui.QWidget()
         self.tab_3.setObjectName(_fromUtf8("tab_3"))
         self.gridLayout_8 = QtGui.QGridLayout(self.tab_3)
+        self.gridLayout_8.setMargin(11)
+        self.gridLayout_8.setSpacing(6)
         self.gridLayout_8.setObjectName(_fromUtf8("gridLayout_8"))
         self.grpOptions = QtGui.QGroupBox(self.tab_3)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
@@ -219,6 +239,8 @@ class Ui_MapfileExportDlg(object):
         self.grpOptions.setSizePolicy(sizePolicy)
         self.grpOptions.setObjectName(_fromUtf8("grpOptions"))
         self.gridLayout_5 = QtGui.QGridLayout(self.grpOptions)
+        self.gridLayout_5.setMargin(11)
+        self.gridLayout_5.setSpacing(6)
         self.gridLayout_5.setObjectName(_fromUtf8("gridLayout_5"))
         self.checkBoxForce = QtGui.QCheckBox(self.grpOptions)
         self.checkBoxForce.setObjectName(_fromUtf8("checkBoxForce"))
@@ -239,13 +261,15 @@ class Ui_MapfileExportDlg(object):
         self.groupBox_3.setSizePolicy(sizePolicy)
         self.groupBox_3.setObjectName(_fromUtf8("groupBox_3"))
         self.gridLayout_6 = QtGui.QGridLayout(self.groupBox_3)
+        self.gridLayout_6.setMargin(11)
+        self.gridLayout_6.setSpacing(6)
         self.gridLayout_6.setObjectName(_fromUtf8("gridLayout_6"))
         self.label6_3 = QtGui.QLabel(self.groupBox_3)
         self.label6_3.setMinimumSize(QtCore.QSize(80, 0))
         self.label6_3.setObjectName(_fromUtf8("label6_3"))
         self.gridLayout_6.addWidget(self.label6_3, 0, 0, 1, 1)
         self.txtMapFontsetPath = QtGui.QLineEdit(self.groupBox_3)
-        self.txtMapFontsetPath.setText(_fromUtf8(""))
+        self.txtMapFontsetPath.setText(_fromUtf8("[fontsetpath]"))
         self.txtMapFontsetPath.setObjectName(_fromUtf8("txtMapFontsetPath"))
         self.gridLayout_6.addWidget(self.txtMapFontsetPath, 0, 1, 1, 1)
         self.checkCreateFontFile = QtGui.QCheckBox(self.groupBox_3)
@@ -283,54 +307,54 @@ class Ui_MapfileExportDlg(object):
         MapfileExportDlg.setTabOrder(self.txtMapServerUrl, self.buttonBox)
 
     def retranslateUi(self, MapfileExportDlg):
-        MapfileExportDlg.setWindowTitle(QtGui.QApplication.translate("MapfileExportDlg", "RT MapServer Exporter - Save project to MapFile", None, QtGui.QApplication.UnicodeUTF8))
-        self.btnChooseFile.setText(QtGui.QApplication.translate("MapfileExportDlg", "...", None, QtGui.QApplication.UnicodeUTF8))
-        self.txtMapFilePath.setToolTip(QtGui.QApplication.translate("MapfileExportDlg", "Name for the map file to be created from the QGIS project file", None, QtGui.QApplication.UnicodeUTF8))
-        self.label.setText(QtGui.QApplication.translate("MapfileExportDlg", "Map file", None, QtGui.QApplication.UnicodeUTF8))
-        self.grpMap.setTitle(QtGui.QApplication.translate("MapfileExportDlg", "Map", None, QtGui.QApplication.UnicodeUTF8))
-        self.label1.setText(QtGui.QApplication.translate("MapfileExportDlg", "Name", None, QtGui.QApplication.UnicodeUTF8))
-        self.label5.setText(QtGui.QApplication.translate("MapfileExportDlg", "Image type", None, QtGui.QApplication.UnicodeUTF8))
-        self.label2.setText(QtGui.QApplication.translate("MapfileExportDlg", "Width", None, QtGui.QApplication.UnicodeUTF8))
-        self.label3.setText(QtGui.QApplication.translate("MapfileExportDlg", "Height", None, QtGui.QApplication.UnicodeUTF8))
-        self.label4.setText(QtGui.QApplication.translate("MapfileExportDlg", "Units", None, QtGui.QApplication.UnicodeUTF8))
-        self.label6_2.setText(QtGui.QApplication.translate("MapfileExportDlg", "Shape path", None, QtGui.QApplication.UnicodeUTF8))
-        self.txtMapShapePath.setToolTip(QtGui.QApplication.translate("MapfileExportDlg", "Path to the folder where shapefiles are stored.", None, QtGui.QApplication.UnicodeUTF8))
-        self.groupBox_2.setTitle(QtGui.QApplication.translate("MapfileExportDlg", "Web", None, QtGui.QApplication.UnicodeUTF8))
-        self.label6.setText(QtGui.QApplication.translate("MapfileExportDlg", "Online resource URL", None, QtGui.QApplication.UnicodeUTF8))
-        self.txtMapServerUrl.setToolTip(QtGui.QApplication.translate("MapfileExportDlg", "The URL to the mapserver executable.\n"
+        MapfileExportDlg.setWindowTitle(_translate("MapfileExportDlg", "RT MapServer Exporter - Save project to MapFile", None))
+        self.btnChooseFile.setText(_translate("MapfileExportDlg", "...", None))
+        self.txtMapFilePath.setToolTip(_translate("MapfileExportDlg", "Name for the map file to be created from the QGIS project file", None))
+        self.label.setText(_translate("MapfileExportDlg", "Map file", None))
+        self.grpMap.setTitle(_translate("MapfileExportDlg", "Map", None))
+        self.label1.setText(_translate("MapfileExportDlg", "Name", None))
+        self.label5.setText(_translate("MapfileExportDlg", "Image type", None))
+        self.label2.setText(_translate("MapfileExportDlg", "Width", None))
+        self.label3.setText(_translate("MapfileExportDlg", "Height", None))
+        self.label4.setText(_translate("MapfileExportDlg", "Units", None))
+        self.label6_2.setText(_translate("MapfileExportDlg", "Shape path", None))
+        self.txtMapShapePath.setToolTip(_translate("MapfileExportDlg", "Path to the folder where shapefiles are stored.", None))
+        self.groupBox_2.setTitle(_translate("MapfileExportDlg", "Web", None))
+        self.label6.setText(_translate("MapfileExportDlg", "Online resource URL", None))
+        self.txtMapServerUrl.setToolTip(_translate("MapfileExportDlg", "The URL to the mapserver executable.\n"
 "\n"
 "For example: \n"
-"http://my.host.com/cgi-bin/mapserv.exe", None, QtGui.QApplication.UnicodeUTF8))
-        self.label6_5.setText(QtGui.QApplication.translate("MapfileExportDlg", "Image path", None, QtGui.QApplication.UnicodeUTF8))
-        self.txtWebImagePath.setToolTip(QtGui.QApplication.translate("MapfileExportDlg", "Path to the temporary directory for writing temporary files and images. Must be writable by the user the web server is running as. Must end with a / or depending on your platform.", None, QtGui.QApplication.UnicodeUTF8))
-        self.label6_4.setText(QtGui.QApplication.translate("MapfileExportDlg", "Temporary path", None, QtGui.QApplication.UnicodeUTF8))
-        self.label6_7.setText(QtGui.QApplication.translate("MapfileExportDlg", "External graphic regexp", None, QtGui.QApplication.UnicodeUTF8))
-        self.label6_6.setText(QtGui.QApplication.translate("MapfileExportDlg", "Image URL", None, QtGui.QApplication.UnicodeUTF8))
-        self.txtWebImageUrl.setToolTip(QtGui.QApplication.translate("MapfileExportDlg", "Base URL for \"Image path\".\n"
-"This is the URL that will take the web browser to \"Image path\" to get the images.", None, QtGui.QApplication.UnicodeUTF8))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtGui.QApplication.translate("MapfileExportDlg", "General", None, QtGui.QApplication.UnicodeUTF8))
-        self.checkTmplFromFile.setToolTip(QtGui.QApplication.translate("MapfileExportDlg", "Forces labels on, regardless of collisions. Available only for cached labels.", None, QtGui.QApplication.UnicodeUTF8))
-        self.checkTmplFromFile.setText(QtGui.QApplication.translate("MapfileExportDlg", "Template from file", None, QtGui.QApplication.UnicodeUTF8))
-        self.txtTemplatePath.setToolTip(QtGui.QApplication.translate("MapfileExportDlg", "Name for the map file to be created from the QGIS project file", None, QtGui.QApplication.UnicodeUTF8))
-        self.btnChooseTemplate.setText(QtGui.QApplication.translate("MapfileExportDlg", "...", None, QtGui.QApplication.UnicodeUTF8))
-        self.checkGenerateTmpl.setToolTip(QtGui.QApplication.translate("MapfileExportDlg", "Forces labels on, regardless of collisions. Available only for cached labels.", None, QtGui.QApplication.UnicodeUTF8))
-        self.checkGenerateTmpl.setText(QtGui.QApplication.translate("MapfileExportDlg", "Autogenerate template for layers", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_2.setText(QtGui.QApplication.translate("MapfileExportDlg", "Header", None, QtGui.QApplication.UnicodeUTF8))
-        self.txtTmplHeaderPath.setToolTip(QtGui.QApplication.translate("MapfileExportDlg", "Name for the map file to be created from the QGIS project file", None, QtGui.QApplication.UnicodeUTF8))
-        self.btnChooseTmplHeader.setText(QtGui.QApplication.translate("MapfileExportDlg", "...", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_3.setText(QtGui.QApplication.translate("MapfileExportDlg", "Footer", None, QtGui.QApplication.UnicodeUTF8))
-        self.txtTmplFooterPath.setToolTip(QtGui.QApplication.translate("MapfileExportDlg", "Name for the map file to be created from the QGIS project file", None, QtGui.QApplication.UnicodeUTF8))
-        self.btnChooseTmplFooter.setText(QtGui.QApplication.translate("MapfileExportDlg", "...", None, QtGui.QApplication.UnicodeUTF8))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QtGui.QApplication.translate("MapfileExportDlg", "Template", None, QtGui.QApplication.UnicodeUTF8))
-        self.grpOptions.setTitle(QtGui.QApplication.translate("MapfileExportDlg", "Label options", None, QtGui.QApplication.UnicodeUTF8))
-        self.checkBoxForce.setToolTip(QtGui.QApplication.translate("MapfileExportDlg", "Forces labels on, regardless of collisions. Available only for cached labels.", None, QtGui.QApplication.UnicodeUTF8))
-        self.checkBoxForce.setText(QtGui.QApplication.translate("MapfileExportDlg", "Force", None, QtGui.QApplication.UnicodeUTF8))
-        self.checkBoxPartials.setToolTip(QtGui.QApplication.translate("MapfileExportDlg", "Can text run off the edge of the map?", None, QtGui.QApplication.UnicodeUTF8))
-        self.checkBoxPartials.setText(QtGui.QApplication.translate("MapfileExportDlg", "Partials", None, QtGui.QApplication.UnicodeUTF8))
-        self.groupBox_3.setTitle(QtGui.QApplication.translate("MapfileExportDlg", "Fontset", None, QtGui.QApplication.UnicodeUTF8))
-        self.label6_3.setText(QtGui.QApplication.translate("MapfileExportDlg", "Path", None, QtGui.QApplication.UnicodeUTF8))
-        self.txtMapFontsetPath.setToolTip(QtGui.QApplication.translate("MapfileExportDlg", "path", None, QtGui.QApplication.UnicodeUTF8))
-        self.checkCreateFontFile.setToolTip(QtGui.QApplication.translate("MapfileExportDlg", "Forces labels on, regardless of collisions. Available only for cached labels.", None, QtGui.QApplication.UnicodeUTF8))
-        self.checkCreateFontFile.setText(QtGui.QApplication.translate("MapfileExportDlg", "Generate used fonts file", None, QtGui.QApplication.UnicodeUTF8))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), QtGui.QApplication.translate("MapfileExportDlg", "Advanced", None, QtGui.QApplication.UnicodeUTF8))
+"http://my.host.com/cgi-bin/mapserv.exe", None))
+        self.label6_5.setText(_translate("MapfileExportDlg", "Image path", None))
+        self.txtWebImagePath.setToolTip(_translate("MapfileExportDlg", "Path to the temporary directory for writing temporary files and images. Must be writable by the user the web server is running as. Must end with a / or depending on your platform.", None))
+        self.label6_4.setText(_translate("MapfileExportDlg", "Temporary path", None))
+        self.label6_7.setText(_translate("MapfileExportDlg", "External graphic regexp", None))
+        self.label6_6.setText(_translate("MapfileExportDlg", "Image URL", None))
+        self.txtWebImageUrl.setToolTip(_translate("MapfileExportDlg", "Base URL for \"Image path\".\n"
+"This is the URL that will take the web browser to \"Image path\" to get the images.", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MapfileExportDlg", "General", None))
+        self.checkTmplFromFile.setToolTip(_translate("MapfileExportDlg", "Forces labels on, regardless of collisions. Available only for cached labels.", None))
+        self.checkTmplFromFile.setText(_translate("MapfileExportDlg", "Template from file", None))
+        self.txtTemplatePath.setToolTip(_translate("MapfileExportDlg", "Name for the map file to be created from the QGIS project file", None))
+        self.btnChooseTemplate.setText(_translate("MapfileExportDlg", "...", None))
+        self.checkGenerateTmpl.setToolTip(_translate("MapfileExportDlg", "Forces labels on, regardless of collisions. Available only for cached labels.", None))
+        self.checkGenerateTmpl.setText(_translate("MapfileExportDlg", "Autogenerate template for layers", None))
+        self.label_2.setText(_translate("MapfileExportDlg", "Header", None))
+        self.txtTmplHeaderPath.setToolTip(_translate("MapfileExportDlg", "Name for the map file to be created from the QGIS project file", None))
+        self.btnChooseTmplHeader.setText(_translate("MapfileExportDlg", "...", None))
+        self.label_3.setText(_translate("MapfileExportDlg", "Footer", None))
+        self.txtTmplFooterPath.setToolTip(_translate("MapfileExportDlg", "Name for the map file to be created from the QGIS project file", None))
+        self.btnChooseTmplFooter.setText(_translate("MapfileExportDlg", "...", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MapfileExportDlg", "Template", None))
+        self.grpOptions.setTitle(_translate("MapfileExportDlg", "Label options", None))
+        self.checkBoxForce.setToolTip(_translate("MapfileExportDlg", "Forces labels on, regardless of collisions. Available only for cached labels.", None))
+        self.checkBoxForce.setText(_translate("MapfileExportDlg", "Force", None))
+        self.checkBoxPartials.setToolTip(_translate("MapfileExportDlg", "Can text run off the edge of the map?", None))
+        self.checkBoxPartials.setText(_translate("MapfileExportDlg", "Partials", None))
+        self.groupBox_3.setTitle(_translate("MapfileExportDlg", "Fontset", None))
+        self.label6_3.setText(_translate("MapfileExportDlg", "Path", None))
+        self.txtMapFontsetPath.setToolTip(_translate("MapfileExportDlg", "path", None))
+        self.checkCreateFontFile.setToolTip(_translate("MapfileExportDlg", "Forces labels on, regardless of collisions. Available only for cached labels.", None))
+        self.checkCreateFontFile.setText(_translate("MapfileExportDlg", "Generate used fonts file", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MapfileExportDlg", "Advanced", None))
 
