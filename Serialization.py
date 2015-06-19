@@ -223,7 +223,7 @@ class SymbolLayerSerializer(object):
        
         # Emit line pattern only if we have a non-solid pen
         if sl.penStyle() != Qt.NoPen and sl.penStyle() != Qt.SolidLine:
-            msStyle.pattern = utils.serializePenStylePattern(sl)
+            utils.setPenStylePattern(msStyle, utils.serializePenStylePattern(sl))
 
         msStyle.width = 0 if sl.penStyle() == Qt.NoPen else utils.mmToPx(sl.width())
 
@@ -247,7 +247,7 @@ class SymbolLayerSerializer(object):
 
             # Emit line pattern only if we have a non-solid pen
             if sl.borderStyle() != Qt.SolidLine:
-                msStyleOutline.pattern = utils.serializePenStylePattern(sl)
+                utils.setPenStylePattern(msStyleOutline, utils.serializePenStylePattern(sl))
 
     
     def serializeSimpleMarkerSymbolLayer(self, sl, fillProperties=None):
@@ -291,7 +291,7 @@ class SymbolLayerSerializer(object):
                 msStyleOutline.angle = fillProperties['angle']
 
             if sl.outlineStyle() != Qt.SolidLine:
-                msStyleOutline.pattern = utils.serializePenStylePattern(sl)
+                utils.setPenStylePattern(msStyleOutline, utils.serializePenStylePattern(sl))
 
 
     def serializeSvgMarkerSymbolLayer(self, sl):

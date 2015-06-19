@@ -99,6 +99,36 @@ def serializeColor(qColor):
     msColor = mapscript.colorObj(qColor.red(), qColor.green(), qColor.blue(), qColor.alpha())
     return msColor
 
+def setPenStylePattern(style, pattern):
+    """Set the PATTERN clause on a MapServer Style
+    
+        Please note that before MapServer version 7 it is impossible to set the `pattern`
+        property on `styleObj`s.
+        In MapServer 6.4 we use a workaround that involves manually adding the PATTERN clause
+        to the style. This does not work in previous versions as the `styleObj.convertToString()`
+        was added in MapServer 6.4
+        (see http://mapserver.org/tr/mapscript/mapscript.html#styleobj-methods).
+
+        Relevant MapServer bug:
+            https://github.com/mapserver/mapserver/issues/4943
+    """
+
+    if mapscript.MS_VERSION_MAJOR == 7:
+        style.pattern = pattern
+
+    elif (mapscript.MS_VERSION_MAJOR == 6) and (mapscript.MS_VERSION_MINOR >= 4):
+        patternStr = "\nPATTERN %s END\nEND" % ' '.join(map(str, pattern))
+        styleStr = style.convertToString().rsplit('END', 1)
+
+        style.updateFromString('%s%s%s' % (styleStr[0], patternStr, styleStr[1]))
+
+    else:
+        QgsMessageLog.logMessage(
+            'Line patterns are only supported in MapServer versions 6.4 and above.',
+            'RT MapServer Exporter'
+        )
+
+        
 
 def serializePenStylePattern(sl):
     """Serialize the Qt.PenStyle() of a symbol layer's outline/border into mapscript form"""
