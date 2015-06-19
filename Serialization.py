@@ -53,6 +53,7 @@ class LabelStyleSerializer(object):
             # the plugin UI. There is no point in emitting font definitions without a valid fontset,
             # so in that case we fall back to using whatever default font MapServer (thus the
             # underlying windowing system) provides.
+            # Please note that substituting the default font only works in MapServer 7.0.0 and above.
             if emitFontDefinitions == True:
                 msLabel.font = fontDef
 
