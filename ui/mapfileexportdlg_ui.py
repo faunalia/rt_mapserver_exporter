@@ -245,7 +245,7 @@ class Ui_MapfileExportDlg(object):
         self.label6_3.setObjectName(_fromUtf8("label6_3"))
         self.gridLayout_6.addWidget(self.label6_3, 0, 0, 1, 1)
         self.txtMapFontsetPath = QtGui.QLineEdit(self.groupBox_3)
-        self.txtMapFontsetPath.setText(_fromUtf8("[fontsetpath]"))
+        self.txtMapFontsetPath.setText(_fromUtf8(""))
         self.txtMapFontsetPath.setObjectName(_fromUtf8("txtMapFontsetPath"))
         self.gridLayout_6.addWidget(self.txtMapFontsetPath, 0, 1, 1, 1)
         self.checkCreateFontFile = QtGui.QCheckBox(self.groupBox_3)
