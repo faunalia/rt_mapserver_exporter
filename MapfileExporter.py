@@ -1,4 +1,5 @@
 import re
+import codecs
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -38,8 +39,6 @@ def export(
     legend = None,
     canvas = QgsMapCanvas()
 ):
-    QgsMessageLog.logMessage(mapfilePath, 'MapServer exporter')
-
     # Create a new msMap
     msMap = mapscript.mapObj()
     msMap.name = name
@@ -86,7 +85,7 @@ def export(
 
     # Map metadata
     msMap.setMetaData('ows_title', msMap.name)
-    msMap.setMetaData('ows_onlineresource', toUTF8(u'%s?map=%s' % (mapServerURL, mapfilePath)))
+    msMap.setMetaData('ows_onlineresource', '%s?map=%s' % (mapServerURL, toUTF8(mapfilePath)))
     srsList = []
     srsList.append(toUTF8(canvas.mapRenderer().destinationCrs().authid()))
     msMap.setMetaData('ows_srs', ' '.join(srsList))
@@ -98,7 +97,7 @@ def export(
         # Check if layer is a supported type... seems return None if type is not supported (e.g. csv)
         if (utils.getLayerType(layer) == None):
             QMessageBox.warning(
-                self, 
+                None, 
                 'RT MapServer Exporter',
                 'Skipped not supported layer: %s' % layer.name()
             )
@@ -223,7 +222,15 @@ def export(
             Serialization.LabelStyleSerializer(layer, msLayer, msMap, fontsetPath != '')
 
     # Save the map file
-    if mapscript.MS_SUCCESS != msMap.save(mapfilePath):
+    try:
+        if mapscript.MS_SUCCESS != msMap.save(mapfilePath.encode('utf8')):
+            return
+    except:
+        QMessageBox.warning(
+            None,
+            'RT MapServer Exporter',
+            'Unsupported unicode filename: %s' % mapfilePath
+        )
         return
 
     # Most of the following code does not use mapscript because it asserts
@@ -246,7 +253,7 @@ def export(
 
     # retrieve the list of used font aliases searching for FONT keywords
     fonts = []
-    searchFontRx = re.compile("^\\s*FONT\\s+")
+    searchFontRx = re.compile(u'^\\s*FONT\\s+')
 
     for line in filter(searchFontRx.search, parts):
         # get the font alias, remove quotes around it
@@ -273,7 +280,7 @@ def export(
         fontPath = QFileInfo(mapfilePath).dir().filePath(u'fonts.txt')
         with open(unicode(fontPath), 'w') as fout:
             for fontAlias in fonts:
-                fout.write(unicode(fontAlias))
+                fout.write(fontAlias)
 
     # add the FONTSET keyword with the associated path
     if fontsetPath != '':
@@ -290,6 +297,6 @@ def export(
 
     # if mapfile content changed, store the file again at the same path
     if partsContentChanged:
-        with open(mapfilePath, 'w') as fout:
+        with codecs.open(mapfilePath, 'w', 'utf-8') as fout:
             for part in parts:
-                fout.write(part + "\n")
+                fout.write(part.decode('utf-8') + '\n')

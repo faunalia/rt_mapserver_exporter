@@ -139,9 +139,9 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
                 templateHeaderPath = toUTF8(self.getTemplateHeaderPath()),
                 templateFooterPath = toUTF8(self.getTemplateFooterPath()),
                 mapServerURL = toUTF8(self.txtMapServerUrl.text()),
-                mapfilePath = toUTF8(self.txtMapFilePath.text()),
+                mapfilePath = self.txtMapFilePath.text(),
                 createFontFile = self.checkCreateFontFile.isChecked(),
-                fontsetPath = self.txtMapFontsetPath.text(), 
+                fontsetPath = toUTF8(self.txtMapFontsetPath.text()),
 
                 layers = self.legend.layers(),
                 legend = self.legend
@@ -226,7 +226,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
             # store the template alongside the mapfile
             tmplPath = self.txtMapFilePath.text() + ".html.tmpl"
             with open(unicode(tmplPath), 'w') as fout:
-                fout.write(tmplContent)
+                fout.write(toUTF8(tmplContent))
             return tmplPath
 
     def getTemplateHeaderPath(self):

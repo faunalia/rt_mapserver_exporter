@@ -298,7 +298,7 @@ class SymbolLayerSerializer(object):
     def serializeSvgMarkerSymbolLayer(self, sl):
         """Serialize a QGis SVG marker symbol layer into a MapServer style"""
 
-        msSymbol = utils.serializeSvgSymbol(str(sl.path()))
+        msSymbol = utils.serializeSvgSymbol(sl.path().encode('utf-8'))
         self.msMap.symbolset.appendSymbol(msSymbol)
 
         msStyle = mapscript.styleObj(self.msClass)
