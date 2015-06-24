@@ -20,7 +20,7 @@ def export(
     height = DEFAULT_HEIGHT,
     units = mapscript.MS_METERS,
     extent = QgsRectangle(),
-    projection = str(QgsCoordinateReferenceSystem('4326').toProj4()),
+    projection = toUTF8(QgsCoordinateReferenceSystem('4326').toProj4()),
     shapePath = u'',
     backgroundColor = QColor(),
     imageType = u'PNG',
@@ -125,7 +125,7 @@ def export(
 
 
         msLayer.setMetaData('ows_title', msLayer.name)
-        msLayer.setMetaData('ows_srs', str(layer.crs().authid()))
+        msLayer.setMetaData('ows_srs', toUTF8(layer.crs().authid()))
         msLayer.setMetaData('gml_include_items', 'all')
 
         # Layer connection

@@ -20,13 +20,14 @@ class LabelStyleSerializer(object):
             ps = QgsPalLayerSettings.fromLayer(self.layer)
 
             if not ps.isExpression:
-                self.msLayer.labelitem = str(ps.fieldName)
+                self.msLayer.labelitem = unicode(ps.fieldName).encode('utf-8')
             else:
                 pass
 
             msLabel = mapscript.labelObj()
 
             msLabel.type = mapscript.MS_TRUETYPE
+            msLabel.encoding = 'utf-8'
            
             # Position, rotation and scaling
             msLabel.position = utils.serializeLabelPosition(ps)
@@ -37,7 +38,7 @@ class LabelStyleSerializer(object):
             # Please note that this is the only currently supported data defined property.
             if QgsPalLayerSettings.Rotation in ps.dataDefinedProperties.keys():
                 dd = ps.dataDefinedProperty(QgsPalLayerSettings.Rotation)
-                rotField = str(dd.field())
+                rotField = unicode(dd.field()).encode('utf-8')
                 msLabel.setBinding(mapscript.MS_LABEL_BINDING_ANGLE, rotField)
             else:
                 msLabel.angle = ps.angleOffset
@@ -65,7 +66,18 @@ class LabelStyleSerializer(object):
                 msLabel.maxsize = ps.fontMaxPixelSize
 
             # Other properties
-            msLabel.wrap = str(ps.wrapChar)
+            wrap = unicode(ps.wrapChar).encode('utf-8')
+            if len(wrap) == 1:
+                msLabel.wrap = wrap[0]
+            elif len(wrap) > 1:
+                QgsMessageLog.logMessage(
+                    u'Skipping invalid wrap character ("%s") for labels.' % wrap.decode('utf-8'),
+                    'RT MapServer Exporter'
+                )
+            else:
+                # No wrap char set
+                pass
+
             msLabel.priority = ps.priority
             msLabel.buffer = int(utils.mmToPx(ps.bufferSize))
 
@@ -133,9 +145,9 @@ class VectorLayerStyleSerializer(object):
             # XXX: type(cat.value()) differs whether the script is being run in QGis or as 
             # a standalone PyQGis application, so we convert it accordingly.
             cv = cat.value()
-            cv = cv.toString() if isinstance(cv, QVariant) else str(cv)
+            cv = cv.toString() if isinstance(cv, QVariant) else unicode(cv)
 
-            msClass.setExpression(u'("[%s]" = "%s")' % (attr, cv))
+            msClass.setExpression((u'("[%s]" = "%s")' % (attr, cv)).encode('utf-8'))
             SymbolLayerSerializer(renderer.symbols()[i], msClass, self.msLayer, self.msMap)
             i = i + 1
 
@@ -143,7 +155,7 @@ class VectorLayerStyleSerializer(object):
     def serializeGraduatedSymbolRenderer(self, renderer):
         """Serialize a QGis graduated symbol renderer into MapServer classes"""
 
-        attr = renderer.usedAttributes()[0]
+        attr = unicode(renderer.usedAttributes()[0])
         i = 0
 
         for range in renderer.ranges():
@@ -151,13 +163,13 @@ class VectorLayerStyleSerializer(object):
 
             # We use '>=' instead of '>' when defining the first class to also include the lowest
             # value of the range in the expression.
-            msClass.setExpression(u'(([%s] %s %f) And ([%s] <= %f))' % ( \
+            msClass.setExpression((u'(([%s] %s %f) And ([%s] <= %f))' % ( \
                 attr, \
                 '>=' if (i == 0) else '>', \
                 range.lowerValue(), \
                 attr, \
                 range.upperValue() \
-            ))
+            )).encode('utf-8'))
             SymbolLayerSerializer(renderer.symbols()[i], msClass, self.msLayer, self.msMap)
             i = i + 1
 
@@ -254,9 +266,10 @@ class SymbolLayerSerializer(object):
     def serializeSimpleMarkerSymbolLayer(self, sl, fillProperties=None):
         """Serialize a QGis simple marker symbol layer into MapServer styles"""
 
-        # Emit fill only if it's visible and the marker is polygonal 
-        if (sl.fillColor().alpha() != 0) and utils.isWellKnownMarkerPolygonal(str(sl.name())):
-            msFillSymbol = utils.serializeWellKnownMarker(str(sl.name()), True)
+        # Emit fill only if it's visible and the marker is polygonal
+        markerName = unicode(sl.name()).encode('utf-8')
+        if (sl.fillColor().alpha() != 0) and utils.isWellKnownMarkerPolygonal(markerName):
+            msFillSymbol = utils.serializeWellKnownMarker(markerName, True)
             self.msMap.symbolset.appendSymbol(msFillSymbol) 
 
             msStyleBg = mapscript.styleObj(self.msClass)
@@ -272,7 +285,7 @@ class SymbolLayerSerializer(object):
 
         # Emit outline only if the marker has one
         if sl.outlineStyle() != Qt.NoPen:
-            msOutlineSymbol = utils.serializeWellKnownMarker(str(sl.name()), False)
+            msOutlineSymbol = utils.serializeWellKnownMarker(markerName, False)
             self.msMap.symbolset.appendSymbol(msOutlineSymbol)
 
             msStyleOutline = mapscript.styleObj(self.msClass)
@@ -312,8 +325,20 @@ class SymbolLayerSerializer(object):
         msSymbol = mapscript.symbolObj(utils.makeSymbolUUID('truetype'))
         msSymbol.type = mapscript.MS_SYMBOL_TRUETYPE
         msSymbol.filled = True
-        msSymbol.character = str(sl.character())
         msSymbol.inmapfile = True
+
+        char = unicode(sl.character()).encode('utf-8')
+        if len(char) == 1:
+            msSymbol.character = char[0]
+        elif len(char) > 1:
+            QgsMessageLog.logMessage(
+                u'Skipping invalid character ("%s") for font marker.' % char.decode('utf-8'),
+                'RT MapServer Exporter'
+            )
+        else:
+            # No char set
+            pass
+
 
         self.msMap.symbolset.appendSymbol(msSymbol)
 
