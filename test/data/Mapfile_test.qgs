@@ -29,7 +29,7 @@
         <layer-tree-layer expanded="0" checked="Qt::Checked" id="Thematic_lines20150529080745778" name="Thematic_lines">
             <customproperties/>
         </layer-tree-layer>
-        <layer-tree-layer expanded="1" checked="Qt::Checked" id="DottedFill_Polygon20150529080447153" name="DottedFill_Polygon">
+        <layer-tree-layer expanded="1" checked="Qt::Checked" id="DottedFill_Polygon20150529080447153" name="DottedFill_PolygonÉ">
             <customproperties/>
         </layer-tree-layer>
         <layer-tree-layer expanded="1" checked="Qt::Checked" id="Font_pont20150529080151441" name="Font_pont">
@@ -43,10 +43,10 @@
     <mapcanvas>
         <units>meters</units>
         <extent>
-            <xmin>630975.70264564058743417</xmin>
-            <ymin>244092.91748621923034079</ymin>
-            <xmax>644040.2153799154330045</xmax>
-            <ymax>250655.61307221560855396</ymax>
+            <xmin>630957.43911432521417737</xmin>
+            <ymin>243039.7205136984703131</ymin>
+            <xmax>644021.9518486000597477</xmax>
+            <ymax>249602.41609969484852627</ymax>
         </extent>
         <projections>1</projections>
         <destinationsrs>
@@ -136,7 +136,7 @@
                 <legendlayerfile isInOverview="0" layerid="Thematic_lines20150529080745778" visible="1"/>
             </filegroup>
         </legendlayer>
-        <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="DottedFill_Polygon" showFeatureCount="0">
+        <legendlayer drawingOrder="-1" open="true" checked="Qt::Checked" name="DottedFill_PolygonÉ" showFeatureCount="0">
             <filegroup open="true" hidden="false">
                 <legendlayerfile isInOverview="0" layerid="DottedFill_Polygon20150529080447153" visible="1"/>
             </filegroup>
@@ -483,7 +483,7 @@
                 </edittype>
             </edittypes>
         </maplayer>
-        <maplayer minimumScale="-4.65661e-10" maximumScale="1e+08" simplifyDrawingHints="0" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="5" geometry="Point" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
+        <maplayer minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="0" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="5" geometry="Point" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
             <id>Categorized_Marker20150618121615449</id>
             <datasource>./Categorized_Marker.shp</datasource>
             <title></title>
@@ -521,7 +521,7 @@
                     <category render="true" symbol="0" value="A" label="A"/>
                     <category render="true" symbol="1" value="B" label="B"/>
                     <category render="true" symbol="2" value="C" label="C"/>
-                    <category render="true" symbol="3" value="" label=""/>
+                    <category render="true" symbol="3" value="ÉÉÉ" label=""/>
                 </categories>
                 <symbols>
                     <symbol alpha="1" type="marker" name="0">
@@ -663,7 +663,7 @@
                 <property key="labeling/distMapUnitMinScale" value="0"/>
                 <property key="labeling/enabled" value="false"/>
                 <property key="labeling/fieldName" value=""/>
-                <property key="labeling/fontBold" value="false"/>
+                <property key="labeling/fontBold" value="true"/>
                 <property key="labeling/fontCapitals" value="0"/>
                 <property key="labeling/fontFamily" value="Proxima Nova"/>
                 <property key="labeling/fontItalic" value="false"/>
@@ -677,7 +677,7 @@
                 <property key="labeling/fontSizeMapUnitMinScale" value="0"/>
                 <property key="labeling/fontStrikeout" value="false"/>
                 <property key="labeling/fontUnderline" value="false"/>
-                <property key="labeling/fontWeight" value="50"/>
+                <property key="labeling/fontWeight" value="75"/>
                 <property key="labeling/fontWordSpacing" value="0"/>
                 <property key="labeling/formatNumbers" value="false"/>
                 <property key="labeling/isExpression" value="true"/>
@@ -1057,7 +1057,7 @@
                 </edittype>
             </edittypes>
         </maplayer>
-        <maplayer minimumScale="-4.65661e-10" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" geometry="Polygon" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
+        <maplayer minimumScale="0" maximumScale="1e+08" simplifyDrawingHints="1" minLabelScale="0" maxLabelScale="1e+08" simplifyDrawingTol="1" geometry="Polygon" simplifyMaxScale="1" type="vector" hasScaleBasedVisibilityFlag="0" simplifyLocal="1" scaleBasedLabelVisibilityFlag="0">
             <id>DottedFill_Polygon20150529080447153</id>
             <datasource>./DottedFill_Polygon.shp</datasource>
             <title></title>
@@ -1065,7 +1065,7 @@
             <keywordList>
                 <value></value>
             </keywordList>
-            <layername>DottedFill_Polygon</layername>
+            <layername>DottedFill_PolygonÉ</layername>
             <srs>
                 <spatialrefsys>
                     <proj4>+proj=somerc +lat_0=47.14439372222222 +lon_0=19.04857177777778 +k_0=0.99993 +x_0=650000 +y_0=200000 +ellps=GRS67 +towgs84=52.17,-71.82,-14.9,0,0,0,0 +units=m +no_defs</proj4>
