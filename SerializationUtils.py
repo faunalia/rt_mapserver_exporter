@@ -10,11 +10,36 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
 from qgis.gui import *
+from qgis.utils import iface
 import mapscript
 
 """Default outline width in pixels"""
 DEFAULT_OUTLINE_WIDTH = 1
 
+
+""" Qt -> MapServer size units """
+SIZE_UNIT_MAP = {
+    QGis.Meters:                mapscript.MS_METERS,
+    QGis.Feet:                  mapscript.MS_FEET,
+    QGis.Degrees:               mapscript.MS_DD,
+    QGis.DecimalDegrees:        mapscript.MS_DD,
+    QGis.NauticalMiles:         mapscript.MS_NAUTICALMILES
+}
+
+def maybeSetLayerSizeUnitFromMap(unit, msLayer):
+    """Set a mapfile layer's size unit from the CRS of the map if `unit` is set to QgsSymbolV2.MapUnit
+    
+        This is a workaround for providing scale-dependent symbology for layers.
+        We cannot set per-style-attribute units in MapServer, so we set the unit on the layer level
+        and pray that all hell does not break loose.
+
+        FIXME: This is *REALLY* ugly.
+    """
+
+    if unit == QgsSymbolV2.MapUnit:
+        msLayer.sizeunits = SIZE_UNIT_MAP[
+            iface.mapCanvas().mapSettings().destinationCrs().mapUnits()
+        ]
 
 """Qt -> MasServer pen styles
     (As per https://github.com/qgis/QGIS/blob/master/src/core/symbology-ng/qgssymbollayerv2utils.cpp)
@@ -27,7 +52,7 @@ PEN_STYLE_MAP = {
 }
 
 
-"""Qt -> Mapserver pen cap styles"""
+"""Qt -> MapServer pen cap styles"""
 PEN_CAP_STYLE_MAP = {
     Qt.FlatCap:   mapscript.MS_CJC_BUTT,
     Qt.RoundCap:  mapscript.MS_CJC_ROUND,
@@ -80,10 +105,13 @@ LABEL_POSITION_MAP = {
 """Default path for extracted SVG images"""
 SVG_IMAGE_DIR = 'svgrasters'
 
-def mmToPx(mm):
-    """Convert millimeters to pixels (assuming an 72dpi display)"""
+def sizeUnitToPx(val, unit):
+    """Convert millimeters/map units to pixels (assuming an 72dpi display)"""
 
-    return mm * 3.779527559
+    if unit == QgsSymbolV2.MM:
+        return val * 3.779527559
+    else:
+        return val
 
 
 def ptToPx(pt):
@@ -138,14 +166,16 @@ def setPenStylePattern(style, pattern):
 def serializePenStylePattern(sl):
     """Serialize the Qt.PenStyle() of a symbol layer's outline/border into mapscript form"""
 
+    curriedSizeUnitToPx = lambda unit: lambda val: sizeUnitToPx(val, unit)
+
     if hasattr(sl, 'penStyle'):
-        return map(mmToPx, PEN_STYLE_MAP[sl.penStyle()]) \
+        return map(curriedSizeUnitToPx(sl.widthUnit()), PEN_STYLE_MAP[sl.penStyle()]) \
             if sl.penStyle() != Qt.CustomDashLine \
             else sl.customDashVector()
     elif hasattr(sl, 'borderStyle'):
-        return map(mmToPx, PEN_STYLE_MAP[sl.borderStyle()])
+        return map(curriedSizeUnitToPx(sl.borderWidthUnit()), PEN_STYLE_MAP[sl.borderStyle()])
     else:
-        return map(mmToPx, PEN_STYLE_MAP[sl.outlineStyle()])
+        return map(curriedSizeUnitToPx(sl.outlineWidthUnit()), PEN_STYLE_MAP[sl.outlineStyle()])
 
 
 def serializePenJoinStyle(pjs):

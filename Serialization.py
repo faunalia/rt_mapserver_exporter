@@ -80,10 +80,13 @@ class LabelStyleSerializer(object):
                 pass
 
             msLabel.priority = ps.priority
-            msLabel.buffer = int(utils.mmToPx(ps.bufferSize))
+            msLabel.buffer = int(utils.sizeUnitToPx(
+                ps.bufferSize,
+                QgsSymbolV2.MapUnit if ps.bufferSizeInMapUnits else QgsSymbolV2.MM
+            ))
 
             if ps.minFeatureSize > 0:
-                msLabel.minfeaturesize = utils.mmToPx(ps.minFeatureSize)
+                msLabel.minfeaturesize = utils.sizeUnitToPx(ps.minFeatureSize)
 
             # Label definitions gets appended to the very first class on a layer, or to a new class
             # if no classes exist.
@@ -239,7 +242,15 @@ class SymbolLayerSerializer(object):
         if sl.penStyle() != Qt.NoPen and sl.penStyle() != Qt.SolidLine:
             utils.setPenStylePattern(msStyle, utils.serializePenStylePattern(sl))
 
-        msStyle.width = 0 if sl.penStyle() == Qt.NoPen else utils.mmToPx(sl.width())
+        msStyle.width = 0 \
+            if sl.penStyle() == Qt.NoPen \
+            else utils.sizeUnitToPx(sl.width(), sl.widthUnit())
+
+        # Assume that this is our only outline and set the layer's size units to map units
+        # if we are using map units in QGis. This breaks every property with a size unit set to
+        # anything other than the map unit.
+        if (sl.width() > 0) and (hatchProperties == None):
+            utils.maybeSetLayerSizeUnitFromMap(sl.widthUnit(), self.msLayer)
 
 
     def serializeSimpleFillSymbolLayer(self, sl):
@@ -256,9 +267,15 @@ class SymbolLayerSerializer(object):
             msStyleOutline.outlinecolor = utils.serializeColor(sl.borderColor())
 
             # QGis draws a default outline of .26mm (roughly 1px) even when the width is set to zero
-            msStyleOutline.width = utils.mmToPx(sl.borderWidth()) \
+            msStyleOutline.width = utils.sizeUnitToPx(sl.borderWidth(), sl.borderWidthUnit()) \
                     if sl.borderWidth() > 0 \
                     else utils.DEFAULT_OUTLINE_WIDTH
+
+            # Assume that this is our only outline and set the layer's size units to map units
+            # if we are using map units in QGis. This breaks every property with a size unit set to
+            # anything other than the map unit.
+            if (sl.borderWidth() > 0):
+                utils.maybeSetLayerSizeUnitFromMap(sl.borderWidthUnit(), self.msLayer)
 
             # Emit line pattern only if we have a non-solid pen
             if sl.borderStyle() != Qt.SolidLine:
@@ -277,7 +294,7 @@ class SymbolLayerSerializer(object):
             msStyleBg = mapscript.styleObj(self.msClass)
             msStyleBg.symbolname = msFillSymbol.name
             msStyleBg.color = utils.serializeColor(sl.fillColor())
-            msStyleBg.size = utils.mmToPx(sl.size())
+            msStyleBg.size = utils.sizeUnitToPx(sl.size(), sl.sizeUnit())
 
             # If `fillProperties` is a dict, we are serializing a marker symbol layer inside a point
             # pattern fill, so we act accordingly and emit the respective properties.
@@ -295,10 +312,10 @@ class SymbolLayerSerializer(object):
             msStyleOutline.color = utils.serializeColor(sl.borderColor())
 
             # QGis draws a default outline of .26mm even when the width is set to zero
-            msStyleOutline.width = utils.mmToPx(sl.outlineWidth()) \
+            msStyleOutline.width = utils.sizeUnitToPx(sl.outlineWidth(), sl.outlineWidthUnit()) \
                     if sl.outlineWidth() > 0 \
                     else utils.DEFAULT_OUTLINE_WIDTH
-            msStyleOutline.size = utils.mmToPx(sl.size())
+            msStyleOutline.size = utils.sizeUnitToPx(sl.size(), sl.sizeUnit())
 
             # If `fillProperties` is a dict, we are serializing a marker symbol layer inside a point
             # pattern fill, so we act accordingly and emit the respective properties.
@@ -321,12 +338,13 @@ class SymbolLayerSerializer(object):
                 u'Cannot serialize SVG symbol: %s' % unicode(e),
                 'RT MapServer Exporter'
             )
+            return
 
         self.msMap.symbolset.appendSymbol(msSymbol)
 
         msStyle = mapscript.styleObj(self.msClass)
         msStyle.symbolname = msSymbol.name
-        msStyle.size = utils.mmToPx(sl.size())
+        msStyle.size = utils.sizeUnitToPx(sl.size(), sl.sizeUnit())
 
 
     def serializeFontMarkerSymbolLayer(self, sl):
@@ -355,7 +373,7 @@ class SymbolLayerSerializer(object):
         msStyle = mapscript.styleObj(self.msClass)
         msStyle.symbolname = msSymbol.name
         msStyle.color = utils.serializeColor(sl.color())
-        msStyle.size = utils.mmToPx(sl.size())
+        msStyle.size = utils.sizeUnitToPx(sl.size(), sl.sizeUnit())
 
 
     def serializeLinePatternFillSymbolLayer(self, sl):
@@ -368,7 +386,7 @@ class SymbolLayerSerializer(object):
                 self.serializeSimpleLineSymbolLayer(
                     ssl,
                     {
-                        'size': utils.mmToPx(sl.distance()),
+                        'size': utils.sizeUnitToPx(sl.distance(), sl.distanceUnit()),
                         'angle': sl.lineAngle()
                     }
                 )
@@ -385,10 +403,10 @@ class SymbolLayerSerializer(object):
                 self.serializeSimpleMarkerSymbolLayer(
                     ssl,
                     {
-                        'distanceX': utils.mmToPx(sl.distanceX()),
-                        'distanceY': utils.mmToPx(sl.distanceY()),
-                        'displacementX': utils.mmToPx(sl.displacementX()),
-                        'displacementY': utils.mmToPx(sl.displacementY()),
+                        'distanceX': utils.sizeUnitToPx(sl.distanceX(), sl.distanceXUnit()),
+                        'distanceY': utils.sizeUnitToPx(sl.distanceY(), sl.distanceYUnit()),
+                        'displacementX': utils.sizeUnitToPx(sl.displacementX(), sl.displacementXUnit()),
+                        'displacementY': utils.sizeUnitToPx(sl.displacementY(), sl.displacementYUnit()),
                         'angle': sl.angle()
                     }
                 )
