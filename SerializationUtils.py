@@ -1,5 +1,8 @@
 import os
+import re
 import string
+import codecs
+import binascii
 import random
 from tempfile import mkstemp
 
@@ -74,6 +77,8 @@ LABEL_POSITION_MAP = {
     QgsPalLayerSettings.QuadrantBelowRight: mapscript.MS_LR
 }
 
+"""Default path for extracted SVG images"""
+SVG_IMAGE_DIR = 'svgrasters'
 
 def mmToPx(mm):
     """Convert millimeters to pixels (assuming an 72dpi display)"""
@@ -90,7 +95,7 @@ def ptToPx(pt):
 def makeSymbolUUID(prefix=''):
     """Generate a globally unique identifier to be used in symbol names"""
 
-    return prefix + '-' + ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
+    return prefix + '_' + ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(10))
 
 
 def serializeColor(qColor):
@@ -178,21 +183,91 @@ def serializeHatchSymbol(msMap):
 def serializeSvgSymbol(svgPath):
     """Serialize an SVG symbol into a mapscript.symbolObj()
 
-        As it is currently (MapServer 7.0.0-beta) impossible to set the `imagepath` attribute on a
-        symbolObj() we use a workaround that involves manually writing, then re-parsing a
-        symbol set definition file.
+        We have a couple of problems here though:
 
-        Possibly relevant MapServer bugs:
-            https://github.com/mapserver/mapserver/issues/4501
-            https://github.com/mapserver/mapserver/issues/5074
-            https://github.com/mapserver/mapserver/issues/5109
+        1. SVGs with embedded raster images
+
+            As MapServer seems to be unable to handle SVG files with an embedded <image />, we use
+            some magic here to extract said image into a separate file and use a pixmap symbol
+            instead. Please note the following:
+                a. We only consider the first embedded image in the SVG file.
+                b. Embedded images are saved to the directory the SVG file resides in.
+
+        2. As it is currently (MapServer 7.0.0-beta) impossible to set the `imagepath` attribute on
+           a symbolObj() we use a workaround that involves manually writing, then re-parsing
+           a symbol set definition file.
+
+            Possibly relevant MapServer bugs:
+                https://github.com/mapserver/mapserver/issues/4501
+                https://github.com/mapserver/mapserver/issues/5074
+                https://github.com/mapserver/mapserver/issues/5109
     """
+
+    # Check if the SVG file contains an embedded image
+    with codecs.open(svgPath, 'r', 'utf-8') as fin:
+        svgContents = fin.read().replace('\n', '')
+    
+    rx = re.compile(u'<image[^>]+xlink:href="([^"]+)"')
+    m = rx.search(svgContents)
+
+    if (m is not None):
+        # We have an image, check if its a data URI or a general one
+        uri = m.group(1)
+        imageType = 'PIXMAP'
+        symbolUUID = makeSymbolUUID('svgraster')
+
+        if uri[:10] == u'data:image':
+            # We have a data URI, save the image into an external file.
+            # Please note that we only consider base64-encoded images here.
+            #
+            dataURIRx = re.compile('data:image/(\w+);base64,(.+)')
+            dm = dataURIRx.match(uri)
+
+            if (dm is not None):
+                imageExt = dm.group(1)
+                try:
+                    imageData = bytearray(binascii.a2b_base64(dm.group(2)))
+                except:
+                    raise ValueError('Cannot decode base64 URI in embedded image while parsing SVG.') 
+                
+                imageName = '%s.%s' % (symbolUUID, imageExt)
+                imageDir = os.path.join(os.path.dirname(svgPath), SVG_IMAGE_DIR)
+                
+                if not os.path.exists(imageDir):
+                    os.makedirs(imageDir)
+
+                imagePath = os.path.join(imageDir, imageName).encode('utf-8')
+
+                with open(imagePath, 'wb') as imageOut:
+                    imageOut.write(imageData)
+
+            else:
+                raise ValueError('Invalid data URI encountered while parsing SVG.')
+            
+        else:
+            # We have a non-data URI.
+            # We only want to consider relative URIs here so perform some naive sanity checks on it
+
+            if uri.startswith('file://'):
+                uri = uri[7:]
+                if (uri.find('..') == -1) and (not uri.startswith('/')):
+                    imagePath = os.path.join(os.path.dirname(svgPath), uri)
+                else:
+                    raise ValueError('Invalid URI encountered while parsing SVG.')
+            else:
+                raise ValueError('Invalid URI encountered while parsing SVG.')
+    else:
+        # We do not have an embedded image thus the SVG is all vector and can probably be 
+        # rendered without a hitch
+
+        imageType = 'SVG' 
+        imagePath = svgPath
 
     symbolSetData = """
         SYMBOLSET
             SYMBOL
                 NAME "%s"
-                TYPE SVG
+                TYPE %s
                 IMAGE "%s"
                 ANCHORPOINT 0.5 0.5
             END
@@ -203,14 +278,14 @@ def serializeSvgSymbol(svgPath):
     (tempHandle, tempName) = mkstemp()
     
     # Write symbol set data
-    os.write(tempHandle, symbolSetData % (makeSymbolUUID('svg'), svgPath))
+    os.write(tempHandle, symbolSetData % (makeSymbolUUID('svg'), imageType, imagePath))
     os.close(tempHandle)
 
     # Load and parse the symbol set
     msSymbolSet = mapscript.symbolSetObj(tempName)
 
     # Remove the temporary file
-    os.unlink(tempName)
+    # os.unlink(tempName)
 
     # Fetch and return our SVG symbol
     msSymbol = msSymbolSet.getSymbol(1)
@@ -275,10 +350,13 @@ def serializeLabelPosition(ps):
 def serializeFontDefinition(font, style):
     """Serialize a font definition and a font size to MapServer"""
 
-    fontDef = '%s-%s' % (
-        font.family().replace(' ', ''),
-        style.replace(' ', '')
-    )
+    family = font.family().replace(' ', '')
+    style = style.replace(' ', '')
+
+    if style == '*':
+        fontDef = family
+    else:
+        fontDef = '%s-%s' % (family, style)
 
     fm = QFontMetrics(font)
 

@@ -140,7 +140,7 @@ def export(
             if uri.keyColumn() != '':
                 data += u' USING UNIQUE %s' % uri.keyColumn()
 
-            data += u' USING UNIQUE %s' % layer.crs().postgisSrid()
+            data += u' USING srid=%s' % layer.crs().postgisSrid()
 
             if uri.sql() != '':
                 data += u' FILTER (%s)' % uri.sql()
@@ -240,7 +240,7 @@ def export(
     # Get the mapfile content as string so we can manipulate on it
     mesg = 'Reload Map file %s to manipulate it' % mapfilePath
     QgsMessageLog.logMessage(mesg, 'RT MapServer Exporter')
-    fin = open(mapfilePath, 'r')
+    fin = codecs.open(mapfilePath, 'r', 'utf-8')
     parts = []
     line = fin.readline()
     while line != "":
@@ -268,7 +268,7 @@ def export(
             # update the font alias in the mapfile
             # XXX: the following lines cannot be removed since the SLD file
             # could refer a font whose name contains spaces. When SLD specs
-            # ate clear on how to handle fonts than we'll think whether
+            # are clear on how to handle fonts than we'll think whether
             # remove it or not.
             replaceFontRx = re.compile(u"^(\\s*FONT\\s+\")%s(\".*)$" % QRegExp.escape(fontName))
             parts = [ replaceFontRx.sub(u"\g<1>%s\g<2>" % fontAlias, part) for part in parts ]
@@ -299,4 +299,4 @@ def export(
     if partsContentChanged:
         with codecs.open(mapfilePath, 'w', 'utf-8') as fout:
             for part in parts:
-                fout.write(part.decode('utf-8') + '\n')
+                fout.write(part + '\n')

@@ -1,4 +1,5 @@
 import mapscript
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
@@ -247,6 +248,7 @@ class SymbolLayerSerializer(object):
         msStyleBg = mapscript.styleObj(self.msClass)
         msStyleBg.angle = sl.angle()
         msStyleBg.color = utils.serializeColor(sl.fillColor())
+        msStyleBg.opacity = int((sl.fillColor().alpha() / 255.0) * 100)
 
         # Only serialize outline if we have one
         if sl.borderStyle() != Qt.NoPen:
@@ -309,9 +311,17 @@ class SymbolLayerSerializer(object):
 
 
     def serializeSvgMarkerSymbolLayer(self, sl):
-        """Serialize a QGis SVG marker symbol layer into a MapServer style"""
+        """Serialize a QGis SVG marker symbol layer into a MapServer style
+        
+        """
+        try:
+            msSymbol = utils.serializeSvgSymbol(unicode(sl.path()).encode('utf-8'))
+        except Exception as e:
+            QgsMessageLog.logMessage(
+                u'Cannot serialize SVG symbol: %s' % unicode(e),
+                'RT MapServer Exporter'
+            )
 
-        msSymbol = utils.serializeSvgSymbol(sl.path().encode('utf-8'))
         self.msMap.symbolset.appendSymbol(msSymbol)
 
         msStyle = mapscript.styleObj(self.msClass)
