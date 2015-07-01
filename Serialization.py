@@ -16,6 +16,7 @@ class LabelStyleSerializer(object):
         self.msMap = msMap
 
         labelingEngine = QgsPalLabeling()
+        labelingEngine.loadEngineSettings()
 
         if labelingEngine and labelingEngine.willUseLayer(self.layer):
             ps = QgsPalLayerSettings.fromLayer(self.layer)
