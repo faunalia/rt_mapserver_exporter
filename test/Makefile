@@ -6,4 +6,4 @@ test:
 	./test.sh
 
 clean:
-	rm test.map test.png fonts.txt
+	rm -rf test.map test.png fonts.txt data/svgrasters
