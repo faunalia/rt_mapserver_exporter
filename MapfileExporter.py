@@ -88,8 +88,15 @@ def export(
     msMap.setMetaData('ows_onlineresource', '%s?map=%s' % (mapServerURL, toUTF8(mapfilePath)))
     srsList = []
     srsList.append(toUTF8(canvas.mapRenderer().destinationCrs().authid()))
-    msMap.setMetaData('ows_srs', ' '.join(srsList))
+    #msMap.setMetaData('ows_srs', ' '.join(srsList))
     msMap.setMetaData('ows_enable_request', '*')
+    msMap.setMetaData('wfs_encoding', 'UTF-8')
+    
+    #need to manipulate legend for getLegendGraphic size
+    #msLegend = mapscript.legendObj(msMap)
+    msMap.legend.keysizex=20
+    msMap.legend.keysizey=20
+    
 
     # Iterate through layers
     for layer in layers:
@@ -139,6 +146,8 @@ def export(
 
             if uri.keyColumn() != '':
                 data += u' USING UNIQUE %s' % uri.keyColumn()
+                # ++
+                msLayer.setMetaData('gml_featureid', toUTF8(uri.keyColumn()))
 
             data += u' USING srid=%s' % layer.crs().postgisSrid()
 

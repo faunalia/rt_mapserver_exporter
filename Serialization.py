@@ -59,6 +59,9 @@ class LabelStyleSerializer(object):
             if emitFontDefinitions == True:
                 msLabel.font = fontDef
 
+            if ps.fontSizeInMapUnits:
+                utils.maybeSetLayerSizeUnitFromMap(QgsSymbolV2.MapUnit, self.msLayer)
+
             # Font size and color
             msLabel.color = utils.serializeColor(ps.textColor)
 
@@ -79,6 +82,8 @@ class LabelStyleSerializer(object):
                 # No wrap char set
                 pass
 
+            # Other properties
+            msLabel.partials = labelingEngine.isShowingPartialsLabels()
             msLabel.priority = ps.priority
             msLabel.buffer = int(utils.sizeUnitToPx(
                 ps.bufferSize,
@@ -153,6 +158,8 @@ class VectorLayerStyleSerializer(object):
 
             msClass.setExpression((u'("[%s]" = "%s")' % (attr, cv)).encode('utf-8'))
             SymbolLayerSerializer(renderer.symbols()[i], msClass, self.msLayer, self.msMap)
+            #add number to class name
+            msClass.name+='_'+str(i)
             i = i + 1
 
 
@@ -175,6 +182,8 @@ class VectorLayerStyleSerializer(object):
                 range.upperValue() \
             )).encode('utf-8'))
             SymbolLayerSerializer(renderer.symbols()[i], msClass, self.msLayer, self.msMap)
+            #add number to class name
+            msClass.name+='_'+str(i)
             i = i + 1
 
 
@@ -186,7 +195,7 @@ class SymbolLayerSerializer(object):
         self.msClass = msClass
         self.msLayer = msLayer
         self.msMap = msMap
-
+        msClass.name=msLayer.name
         for i in range(0, sym.symbolLayerCount()):
             sl = sym.symbolLayer(i)
 
@@ -354,9 +363,12 @@ class SymbolLayerSerializer(object):
         msSymbol.type = mapscript.MS_SYMBOL_TRUETYPE
         msSymbol.filled = True
         msSymbol.inmapfile = True
+        #add font name to symbol object
+        msSymbol.font=sl.fontFamily().encode('utf-8')
 
         char = unicode(sl.character()).encode('utf-8')
-        if len(char) == 1:
+        msSymbol.character=char
+        """if len(char) == 1:
             msSymbol.character = char[0]
         elif len(char) > 1:
             QgsMessageLog.logMessage(
@@ -366,7 +378,7 @@ class SymbolLayerSerializer(object):
         else:
             # No char set
             pass
-
+        """
 
         self.msMap.symbolset.appendSymbol(msSymbol)
 
