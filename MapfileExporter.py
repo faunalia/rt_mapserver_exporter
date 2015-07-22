@@ -134,7 +134,8 @@ def export(
         msLayer.setMetaData('ows_title', msLayer.name)
         msLayer.setMetaData('ows_srs', toUTF8(layer.crs().authid()))
         msLayer.setMetaData('gml_include_items', 'all')
-
+		msLayer.setProcessing('LABEL_NO_CLIP=ON')
+		
         # Layer connection
         if layer.providerType() == 'postgres':
             msLayer.setConnectionType(mapscript.MS_POSTGIS, '')
