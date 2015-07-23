@@ -84,7 +84,7 @@ class LabelStyleSerializer(object):
                 pass
 
             # Other properties
-            msLabel.partials = labelingEngine.isShowingPartialsLabels()
+            msLabel.partials = False
             msLabel.priority = ps.priority
             msLabel.buffer = int(utils.sizeUnitToPx(
                 ps.bufferSize,
