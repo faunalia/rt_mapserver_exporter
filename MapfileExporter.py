@@ -290,7 +290,7 @@ def export(
         fontPath = QFileInfo(mapfilePath).dir().filePath(u'fonts.txt')
         with open(unicode(fontPath), 'w') as fout:
             for fontAlias in fonts:
-                fout.write(fontAlias)
+                fout.write(fontAlias + '\n')
 
     # add the FONTSET keyword with the associated path
     if fontsetPath != '':

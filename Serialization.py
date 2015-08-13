@@ -367,7 +367,7 @@ class SymbolLayerSerializer(object):
         msSymbol.inmapfile = True
 
         # Add font name to symbol object
-        msSymbol.font = sl.fontFamily().encode('utf-8')
+        msSymbol.font = unicode(sl.fontFamily()).encode('utf-8')
         char = unicode(sl.character()).encode('utf-8')
         msSymbol.character = char
 
