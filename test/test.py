@@ -16,7 +16,7 @@ import locale
 QGIS_PREFIX  = '/usr'
 TEST_WD      = path.dirname(path.abspath(__file__))
 
-TEST_PROJECT = path.join(TEST_WD, 'data', 'Mapfile_test.qgs')
+TEST_PROJECT = path.join(TEST_WD, 'data', 'test.qgs')
 SHAPE_PATH   = path.join(TEST_WD, 'data')
 TEMP_PATH    = path.join(TEST_WD, '')
 MAPFILE_PATH = path.join(TEST_WD, 'test.map')
@@ -27,6 +27,8 @@ IMAGE_SIZE   = (600, 600)
 IMAGE_TYPE   = 'PNG'
 
 EXTENT_BUFFER_SIZE = 400
+
+print "TEST PROJECT: ", TEST_PROJECT
 
 def computeExtent(extents):
     r = extents[0]
@@ -71,8 +73,17 @@ class DummyLegendInterface(object):
 
 iface = DummyInterface()
 
+
+if path.isfile(TEST_PROJECT):
+    try:
+        open(TEST_PROJECT)
+        pass
+    except IOError as e:
+        print "Unable to open project file."
+        exit()
+
 QgsProject.instance().setFileName(TEST_PROJECT)
-QgsProject.instance().read()
+QgsProject.instance().read(QFileInfo(TEST_PROJECT))
 
 from rt_mapserver_exporter import MapfileExporter
 plugin = rt_mapserver_exporter.classFactory(iface)
