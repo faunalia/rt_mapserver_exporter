@@ -3,4 +3,5 @@
 test/test.map
 test/test.png
 test/fonts.txt
-test/data/svgrasters/*
+test/fontset
+test/data/assets/svgrasters/*

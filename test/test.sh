@@ -7,6 +7,12 @@ PLUGIN_DIR=~/.qgis2/python/plugins
 PYTHONPATH=/usr/share/qgis/python:/usr/lib/python2.7:/usr/lib/python2.7/site-packages:${PLUGIN_DIR}
 CUSTOM_LOCALE=C
 
+# Paths related to fontset-mocking
+
+FONTS_TXT=fonts.txt
+FONTSET=fontset
+DEFAULT_FONT=DejaVuSans.ttf
+
 # Binaries
 
 PYTHON=python2
@@ -33,7 +39,12 @@ rm "${PLUGIN_DIR}"/rt_mapserver_exporter/*.pyc
 #
 #	- All command line arguments are passed along to the python binary so that we can for example
 #	  break into the REPL with `$0 -i` after running tests (useful for debugging).
-LC_NUMERIC=${CUSTOM_LOCALE} PYTHONPATH="${PYTHONPATH}" ${PYTHON} "${@}" "${TEST_SCRIPT}"
+LC_ALL=${CUSTOM_LOCALE} PYTHONPATH="${PYTHONPATH}" ${PYTHON} "${@}" "${TEST_SCRIPT}"
+
+# Mock a fontset file by substituting all fonts with a default one.
+FONT_PATH=$(locate -i ${DEFAULT_FONT} | head -1)
+sed -e "s!\(.\+\)!\1 ${FONT_PATH}!g" ${FONTS_TXT} > ${FONTSET}
+
 
 # Run `shp2img` to generate an image from the mapfile
 ${SHP2IMG} \

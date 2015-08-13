@@ -11,7 +11,6 @@ import rt_mapserver_exporter
 import mapscript
 
 import locale
-#locale.setlocale(locale.LC_ALL, 'en')
 
 QGIS_PREFIX  = '/usr'
 TEST_WD      = path.dirname(path.abspath(__file__))
@@ -26,9 +25,7 @@ IMAGE_URL    = ''
 IMAGE_SIZE   = (600, 600)
 IMAGE_TYPE   = 'PNG'
 
-EXTENT_BUFFER_SIZE = 400
-
-print "TEST PROJECT: ", TEST_PROJECT
+EXTENT_BUFFER_SIZE = 10
 
 def computeExtent(extents):
     r = extents[0]
@@ -101,6 +98,7 @@ MapfileExporter.export(
     imageURL = IMAGE_URL,
     tempPath = TEMP_PATH,
     mapfilePath = MAPFILE_PATH,
+    fontsetPath = 'fontset',
 
     legend = DummyLegendInterface(),
     layers = iface.layers()
