@@ -312,6 +312,7 @@ class SymbolLayerSerializer(object):
             if isinstance(fillProperties, dict):
                 msStyleBg.gap = (fillProperties['distanceX'] + fillProperties['distanceY']) / 2
                 msStyleBg.angle = fillProperties['angle']
+                print "angle: ", fillProperties['angle']
 
         # Emit outline only if the marker has one
         if sl.outlineStyle() != Qt.NoPen:
@@ -333,6 +334,7 @@ class SymbolLayerSerializer(object):
             if isinstance(fillProperties, dict):
                 msStyleOutline.gap = (fillProperties['distanceX'] + fillProperties['distanceY']) / 2
                 msStyleOutline.angle = fillProperties['angle']
+                print "angle: ", fillProperties['angle']
 
             if sl.outlineStyle() != Qt.SolidLine:
                 utils.setPenStylePattern(msStyleOutline, utils.serializePenStylePattern(sl))
@@ -410,6 +412,6 @@ class SymbolLayerSerializer(object):
                         'distanceY': utils.sizeUnitToPx(sl.distanceY(), sl.distanceYUnit()),
                         'displacementX': utils.sizeUnitToPx(sl.displacementX(), sl.displacementXUnit()),
                         'displacementY': utils.sizeUnitToPx(sl.displacementY(), sl.displacementYUnit()),
-                        'angle': sl.angle()
+                        'angle': ssl.angle()
                     }
                 )
