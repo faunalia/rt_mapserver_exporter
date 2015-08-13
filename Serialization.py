@@ -364,22 +364,11 @@ class SymbolLayerSerializer(object):
         msSymbol.type = mapscript.MS_SYMBOL_TRUETYPE
         msSymbol.filled = True
         msSymbol.inmapfile = True
-        #add font name to symbol object
-        msSymbol.font=sl.fontFamily().encode('utf-8')
 
+        # Add font name to symbol object
+        msSymbol.font = sl.fontFamily().encode('utf-8')
         char = unicode(sl.character()).encode('utf-8')
-        msSymbol.character=char
-        """if len(char) == 1:
-            msSymbol.character = char[0]
-        elif len(char) > 1:
-            QgsMessageLog.logMessage(
-                u'Skipping invalid character ("%s") for font marker.' % char.decode('utf-8'),
-                'RT MapServer Exporter'
-            )
-        else:
-            # No char set
-            pass
-        """
+        msSymbol.character = char
 
         self.msMap.symbolset.appendSymbol(msSymbol)
 
