@@ -84,8 +84,8 @@ class LabelStyleSerializer(object):
                 pass
 
             # Other properties
-            msLabel.partials = False
-            msLabel.force=ps.displayAll
+            msLabel.partials = labelingEngine.isShowingPartialsLabels()
+            msLabel.force = ps.displayAll
             msLabel.priority = ps.priority
             msLabel.buffer = int(utils.sizeUnitToPx(
                 ps.bufferSize,
@@ -312,7 +312,6 @@ class SymbolLayerSerializer(object):
             if isinstance(fillProperties, dict):
                 msStyleBg.gap = (fillProperties['distanceX'] + fillProperties['distanceY']) / 2
                 msStyleBg.angle = fillProperties['angle']
-                print "angle: ", fillProperties['angle']
 
         # Emit outline only if the marker has one
         if sl.outlineStyle() != Qt.NoPen:
@@ -334,7 +333,6 @@ class SymbolLayerSerializer(object):
             if isinstance(fillProperties, dict):
                 msStyleOutline.gap = (fillProperties['distanceX'] + fillProperties['distanceY']) / 2
                 msStyleOutline.angle = fillProperties['angle']
-                print "angle: ", fillProperties['angle']
 
             if sl.outlineStyle() != Qt.SolidLine:
                 utils.setPenStylePattern(msStyleOutline, utils.serializePenStylePattern(sl))
