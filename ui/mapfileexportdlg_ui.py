@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/data/dev/rt_mapserver_exporter/ui/mapfileexportdlg.ui'
+# Form implementation generated from reading ui file '/data/dev/viamap/rt_mapserver_exporter/ui/mapfileexportdlg.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -231,28 +231,6 @@ class Ui_MapfileExportDlg(object):
         self.gridLayout_8.setMargin(11)
         self.gridLayout_8.setSpacing(6)
         self.gridLayout_8.setObjectName(_fromUtf8("gridLayout_8"))
-        self.grpOptions = QtGui.QGroupBox(self.tab_3)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.grpOptions.sizePolicy().hasHeightForWidth())
-        self.grpOptions.setSizePolicy(sizePolicy)
-        self.grpOptions.setObjectName(_fromUtf8("grpOptions"))
-        self.gridLayout_5 = QtGui.QGridLayout(self.grpOptions)
-        self.gridLayout_5.setMargin(11)
-        self.gridLayout_5.setSpacing(6)
-        self.gridLayout_5.setObjectName(_fromUtf8("gridLayout_5"))
-        self.checkBoxForce = QtGui.QCheckBox(self.grpOptions)
-        self.checkBoxForce.setObjectName(_fromUtf8("checkBoxForce"))
-        self.gridLayout_5.addWidget(self.checkBoxForce, 0, 0, 1, 1)
-        self.checkBoxPartials = QtGui.QCheckBox(self.grpOptions)
-        self.checkBoxPartials.setObjectName(_fromUtf8("checkBoxPartials"))
-        self.gridLayout_5.addWidget(self.checkBoxPartials, 0, 1, 1, 1)
-        spacerItem3 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.gridLayout_5.addItem(spacerItem3, 0, 2, 1, 1)
-        self.gridLayout_8.addWidget(self.grpOptions, 1, 0, 1, 1)
-        spacerItem4 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.gridLayout_8.addItem(spacerItem4, 2, 0, 1, 1)
         self.groupBox_3 = QtGui.QGroupBox(self.tab_3)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -276,6 +254,8 @@ class Ui_MapfileExportDlg(object):
         self.checkCreateFontFile.setObjectName(_fromUtf8("checkCreateFontFile"))
         self.gridLayout_6.addWidget(self.checkCreateFontFile, 1, 0, 1, 2)
         self.gridLayout_8.addWidget(self.groupBox_3, 0, 0, 1, 1)
+        spacerItem3 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.gridLayout_8.addItem(spacerItem3, 1, 0, 1, 1)
         self.tabWidget.addTab(self.tab_3, _fromUtf8(""))
         self.gridLayout.addWidget(self.tabWidget, 1, 0, 1, 1)
         self.label.setBuddy(self.txtMapFilePath)
@@ -293,7 +273,7 @@ class Ui_MapfileExportDlg(object):
         self.label6_3.setBuddy(self.txtMapServerUrl)
 
         self.retranslateUi(MapfileExportDlg)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(2)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), MapfileExportDlg.reject)
         QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), MapfileExportDlg.accept)
         QtCore.QObject.connect(self.checkGenerateTmpl, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.templateTable.setEnabled)
@@ -346,11 +326,6 @@ class Ui_MapfileExportDlg(object):
         self.txtTmplFooterPath.setToolTip(_translate("MapfileExportDlg", "Name for the map file to be created from the QGIS project file", None))
         self.btnChooseTmplFooter.setText(_translate("MapfileExportDlg", "...", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MapfileExportDlg", "Template", None))
-        self.grpOptions.setTitle(_translate("MapfileExportDlg", "Label options", None))
-        self.checkBoxForce.setToolTip(_translate("MapfileExportDlg", "Forces labels on, regardless of collisions. Available only for cached labels.", None))
-        self.checkBoxForce.setText(_translate("MapfileExportDlg", "Force", None))
-        self.checkBoxPartials.setToolTip(_translate("MapfileExportDlg", "Can text run off the edge of the map?", None))
-        self.checkBoxPartials.setText(_translate("MapfileExportDlg", "Partials", None))
         self.groupBox_3.setTitle(_translate("MapfileExportDlg", "Fontset", None))
         self.label6_3.setText(_translate("MapfileExportDlg", "Path", None))
         self.txtMapFontsetPath.setToolTip(_translate("MapfileExportDlg", "path", None))

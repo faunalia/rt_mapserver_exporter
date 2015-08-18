@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/data/dev/rt_mapserver_exporter/ui/DlgAbout.ui'
+# Form implementation generated from reading ui file '/data/dev/viamap/rt_mapserver_exporter/ui/DlgAbout.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
