@@ -43,7 +43,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
         self.legend = self.iface.legendInterface()
 
         # hide map unit combo and label
-        self.label4.hide()
+        self.lblMapUnits.hide()
         self.cmbMapUnits.hide()
 
         # setup the template table
@@ -61,6 +61,12 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
         if title != "":
             self.txtMapName.setText( title )
 
+        # Set the export method based on the user's last choice (default to SLD)
+        settings = QSettings()
+        useSLD = settings.value("/rt_mapserver_exporter/useSLD", True, type=bool)
+        self.checkExportSLD.setChecked(useSLD);
+        self.checkExportCustom.setChecked(not useSLD);
+
         # fill the image format combo
         self.cmbMapImageType.addItems( ["png", "gif", "jpeg", "svg", "GTiff"] )
 
@@ -68,6 +74,49 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
         QObject.connect( self.btnChooseTemplate, SIGNAL("clicked()"), self.selectTemplateBody )
         QObject.connect( self.btnChooseTmplHeader, SIGNAL("clicked()"), self.selectTemplateHeader )
         QObject.connect( self.btnChooseTmplFooter, SIGNAL("clicked()"), self.selectTemplateFooter )
+        QObject.connect( self.lblHelpMeDecide, SIGNAL("linkActivated(QString)"), self.showExportMethodHint )
+
+    def showExportMethodHint(self):
+        QMessageBox.information(
+            self,
+            "On Vector Style Export Methods",
+            """ <style>p { margin-bottom: 1em; }</style>
+
+                <p>MapServer Exporter offers two methods for exporting vector layer styles (export of non-vector layers
+                remains unchanged):</p>
+
+                <ul>
+                    <li><p><b>SLD-based method:</b></p>
+
+                        <p>This method uses the SLD (Styled Layer Descriptor) standard as the exchange format for vector
+                        styles between QGIS and MapServer. However, the SLD standard is only partially implemented in 
+                        both QGIS and MapServer. This may result in incorrectly or incompletely exported vector
+                        styles.</p>
+                        
+                        <p>Support for SLD might improve in the future and when it does, you get to enjoy it
+                        automatically, without updating this plugin.</p>
+
+                        <p><i>(This is the method used by previous versions of MapServer Exporter.)</i></p>
+                    </li>
+
+                    <li><p><b>New Python-based exporter:</b></p>
+
+                        <p>This method uses a custom-made exporter written in Python. It does not aim to be
+                        a comprehensive solution to the problem of exporting vector styles but we believe it currently
+                        offers a more faithful rendering of the most commonly used style elements than the SLD-based
+                        method does.</p>
+
+                        <p>This exporter is included with the plugin, therefore new features and bug fixes depend on
+                        updating the plugin itself. If SLD support gains momentum in the future, certain parts of it may
+                        become obsolete and will be superseded by the first method.</p>
+
+                        <p><a href="https://github.com/faunalia/rt_mapserver_exporter/pull/5#issue-101595345">
+                            Click here for a visual comparison and a list of features supported by the new method.
+                        </a></p>
+                    </li>
+                </ul>
+            """
+        )
 
     def selectMapFile(self):
         # retrieve the last used map file path
@@ -142,10 +191,14 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
                 mapfilePath = self.txtMapFilePath.text(),
                 createFontFile = self.checkCreateFontFile.isChecked(),
                 fontsetPath = toUTF8(self.txtMapFontsetPath.text()),
+                useSLD = self.checkExportSLD.isChecked(),
 
                 layers = self.legend.layers(),
                 legend = self.legend
             )
+
+            settings = QSettings()
+            settings.setValue("/rt_mapserver_exporter/useSLD", self.checkExportSLD.isChecked())
 
             QDialog.accept(self)
 

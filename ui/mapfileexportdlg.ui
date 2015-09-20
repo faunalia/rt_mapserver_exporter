@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>547</width>
-    <height>483</height>
+    <height>579</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,7 +34,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -58,21 +58,8 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="3">
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
        <item row="0" column="0">
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="lblMapFilePath">
          <property name="text">
           <string>Map file</string>
          </property>
@@ -94,7 +81,7 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="0" column="0">
-           <widget class="QLabel" name="label1">
+           <widget class="QLabel" name="lblMapName">
             <property name="toolTip">
              <string/>
             </property>
@@ -107,7 +94,7 @@
            </widget>
           </item>
           <item row="0" column="4">
-           <widget class="QLabel" name="label5">
+           <widget class="QLabel" name="lblMapImageType">
             <property name="text">
              <string>Image type</string>
             </property>
@@ -123,7 +110,7 @@
            <widget class="QComboBox" name="cmbMapImageType"/>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="label2">
+           <widget class="QLabel" name="lblMapWidth">
             <property name="text">
              <string>Width</string>
             </property>
@@ -140,7 +127,7 @@
            </widget>
           </item>
           <item row="1" column="2">
-           <widget class="QLabel" name="label3">
+           <widget class="QLabel" name="lblMapHeight">
             <property name="text">
              <string>Height</string>
             </property>
@@ -160,7 +147,7 @@
            </widget>
           </item>
           <item row="1" column="4">
-           <widget class="QLabel" name="label4">
+           <widget class="QLabel" name="lblMapUnits">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -183,7 +170,7 @@
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QLabel" name="label6_2">
+           <widget class="QLabel" name="lblMapShapePath">
             <property name="minimumSize">
              <size>
               <width>80</width>
@@ -222,7 +209,7 @@
         </widget>
        </item>
        <item row="2" column="0" colspan="3">
-        <widget class="QGroupBox" name="groupBox_2">
+        <widget class="QGroupBox" name="grpWeb">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -233,8 +220,55 @@
           <string>Web</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="txtWebImageUrl">
+            <property name="toolTip">
+             <string>Base URL for &quot;Image path&quot;.
+This is the URL that will take the web browser to &quot;Image path&quot; to get the images.</string>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="txtWebTempPath">
+            <property name="toolTip">
+             <string/>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lblWebImageUrl">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Image URL</string>
+            </property>
+            <property name="buddy">
+             <cstring>txtMapServerUrl</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="txtWebImagePath">
+            <property name="toolTip">
+             <string>Path to the temporary directory for writing temporary files and images. Must be writable by the user the web server is running as. Must end with a / or depending on your platform.</string>
+            </property>
+            <property name="text">
+             <string notr="true"/>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="0">
-           <widget class="QLabel" name="label6">
+           <widget class="QLabel" name="lblMapServerUrl">
             <property name="minimumSize">
              <size>
               <width>80</width>
@@ -243,6 +277,38 @@
             </property>
             <property name="text">
              <string>Online resource URL</string>
+            </property>
+            <property name="buddy">
+             <cstring>txtMapServerUrl</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="txtWebTempPath_2">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Temporary path</string>
+            </property>
+            <property name="buddy">
+             <cstring>txtMapServerUrl</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="lblWebImagePath">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Image path</string>
             </property>
             <property name="buddy">
              <cstring>txtMapServerUrl</cstring>
@@ -262,50 +328,8 @@ http://my.host.com/cgi-bin/mapserv.exe</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label6_5">
-            <property name="minimumSize">
-             <size>
-              <width>80</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Image path</string>
-            </property>
-            <property name="buddy">
-             <cstring>txtMapServerUrl</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="txtWebImagePath">
-            <property name="toolTip">
-             <string>Path to the temporary directory for writing temporary files and images. Must be writable by the user the web server is running as. Must end with a / or depending on your platform.</string>
-            </property>
-            <property name="text">
-             <string notr="true"/>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label6_4">
-            <property name="minimumSize">
-             <size>
-              <width>80</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Temporary path</string>
-            </property>
-            <property name="buddy">
-             <cstring>txtMapServerUrl</cstring>
-            </property>
-           </widget>
-          </item>
           <item row="4" column="0">
-           <widget class="QLabel" name="label6_7">
+           <widget class="QLabel" name="lblExternalGraphicRegexp">
             <property name="minimumSize">
              <size>
               <width>80</width>
@@ -333,44 +357,88 @@ http://my.host.com/cgi-bin/mapserv.exe</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label6_6">
-            <property name="minimumSize">
-             <size>
-              <width>80</width>
-              <height>0</height>
-             </size>
-            </property>
+         </layout>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="3">
+        <widget class="QGroupBox" name="grpExportMethod">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="title">
+          <string>Export method for vector layer styles</string>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_5" rowstretch="0,0,0" columnstretch="0,0">
+          <item row="0" column="0">
+           <widget class="QRadioButton" name="checkExportSLD">
             <property name="text">
-             <string>Image URL</string>
+             <string>SLD-based method (used by previous versions of the plugin)</string>
             </property>
-            <property name="buddy">
-             <cstring>txtMapServerUrl</cstring>
+            <property name="checked">
+             <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup</string>
+            </attribute>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="txtWebImageUrl">
-            <property name="toolTip">
-             <string>Base URL for &quot;Image path&quot;.
-This is the URL that will take the web browser to &quot;Image path&quot; to get the images.</string>
-            </property>
+          <item row="1" column="0">
+           <widget class="QRadioButton" name="checkExportCustom">
             <property name="text">
-             <string notr="true"/>
+             <string>New Python-based exporter</string>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">buttonGroup</string>
+            </attribute>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="txtWebTempPath">
-            <property name="toolTip">
-             <string/>
+          <item row="0" column="1">
+           <widget class="QLabel" name="lblHelpMeDecide">
+            <property name="autoFillBackground">
+             <bool>false</bool>
             </property>
             <property name="text">
-             <string notr="true"/>
+             <string>&lt;a href=&quot;#&quot;&gt;(Help me decide)&lt;/a&gt;</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="margin">
+             <number>0</number>
+            </property>
+            <property name="openExternalLinks">
+             <bool>false</bool>
+            </property>
+            <property name="textInteractionFlags">
+             <set>Qt::LinksAccessibleByMouse</set>
             </property>
            </widget>
           </item>
          </layout>
+         <zorder>checkExportSLD</zorder>
+         <zorder>checkExportSLD_2</zorder>
+         <zorder>checkExportCustom</zorder>
+         <zorder>checkExportSLD</zorder>
+         <zorder>grpWeb</zorder>
+         <zorder>lblHelpMeDecide</zorder>
         </widget>
        </item>
       </layout>
@@ -444,7 +512,7 @@ This is the URL that will take the web browser to &quot;Image path&quot; to get 
         </widget>
        </item>
        <item row="3" column="0" colspan="2">
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="lblHeader">
          <property name="text">
           <string>Header</string>
          </property>
@@ -468,7 +536,7 @@ This is the URL that will take the web browser to &quot;Image path&quot; to get 
         </widget>
        </item>
        <item row="4" column="0" colspan="2">
-        <widget class="QLabel" name="label_3">
+        <widget class="QLabel" name="lblFooter">
          <property name="text">
           <string>Footer</string>
          </property>
@@ -524,7 +592,7 @@ This is the URL that will take the web browser to &quot;Image path&quot; to get 
          </property>
          <layout class="QGridLayout" name="gridLayout_6">
           <item row="0" column="0">
-           <widget class="QLabel" name="label6_3">
+           <widget class="QLabel" name="lblMapFontsetPath">
             <property name="minimumSize">
              <size>
               <width>80</width>
@@ -584,6 +652,8 @@ This is the URL that will take the web browser to &quot;Image path&quot; to get 
  <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <tabstops>
+  <tabstop>txtMapFilePath</tabstop>
+  <tabstop>btnChooseFile</tabstop>
   <tabstop>txtMapName</tabstop>
   <tabstop>cmbMapImageType</tabstop>
   <tabstop>txtMapWidth</tabstop>
@@ -591,7 +661,24 @@ This is the URL that will take the web browser to &quot;Image path&quot; to get 
   <tabstop>cmbMapUnits</tabstop>
   <tabstop>txtMapShapePath</tabstop>
   <tabstop>txtMapServerUrl</tabstop>
-  <tabstop>buttonBox</tabstop>
+  <tabstop>txtWebImagePath</tabstop>
+  <tabstop>txtWebImageUrl</tabstop>
+  <tabstop>txtWebTempPath</tabstop>
+  <tabstop>txtExternalGraphicRegexp</tabstop>
+  <tabstop>checkExportSLD</tabstop>
+  <tabstop>checkExportCustom</tabstop>
+  <tabstop>checkTmplFromFile</tabstop>
+  <tabstop>txtTemplatePath</tabstop>
+  <tabstop>btnChooseTemplate</tabstop>
+  <tabstop>checkGenerateTmpl</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>templateTable</tabstop>
+  <tabstop>txtTmplHeaderPath</tabstop>
+  <tabstop>btnChooseTmplHeader</tabstop>
+  <tabstop>txtTmplFooterPath</tabstop>
+  <tabstop>btnChooseTmplFooter</tabstop>
+  <tabstop>txtMapFontsetPath</tabstop>
+  <tabstop>checkCreateFontFile</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -602,8 +689,8 @@ This is the URL that will take the web browser to &quot;Image path&quot; to get 
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>453</x>
-     <y>429</y>
+     <x>462</x>
+     <y>569</y>
     </hint>
     <hint type="destinationlabel">
      <x>240</x>
@@ -619,10 +706,10 @@ This is the URL that will take the web browser to &quot;Image path&quot; to get 
    <hints>
     <hint type="sourcelabel">
      <x>537</x>
-     <y>429</y>
+     <y>569</y>
     </hint>
     <hint type="destinationlabel">
-     <x>597</x>
+     <x>546</x>
      <y>210</y>
     </hint>
    </hints>
@@ -644,4 +731,7 @@ This is the URL that will take the web browser to &quot;Image path&quot; to get 
    </hints>
   </connection>
  </connections>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
 </ui>
