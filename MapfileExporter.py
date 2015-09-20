@@ -110,6 +110,16 @@ def export(
                 'Skipped not supported layer: %s' % layer.name()
             )
             continue
+       
+        # Bail out if the layer is accessed through OGR virtual file system drivers
+        if layer.source().startswith('/vsi'):
+            QMessageBox.warning(
+                None,
+                'RT MapServer Exporter',
+                'Layers inside compressed archives are not supported.'
+            )
+            continue
+
         # Create a layer object
         msLayer = mapscript.layerObj(msMap)
         msLayer.name = toUTF8(layer.name())
