@@ -7,6 +7,35 @@ from qgis.gui import *
 
 import SerializationUtils as utils
 
+class SLDSerializer(object):
+    def __init__(self, layer, msLayer, msMap):
+
+        # Create a temporary .SLD file
+        tempSldFile = QTemporaryFile("rt_mapserver_exporter-XXXXXX.sld")
+        tempSldFile.open()
+        tempSldPath = tempSldFile.fileName()
+        tempSldFile.close()
+        
+        # Export the QGIS layer style to the .SLD file
+        errMsg, ok = layer.saveSldStyle( tempSldPath )
+
+        if not ok:
+            QgsMessageLog.logMessage( errMsg, "RT MapServer Exporter" )
+        else:
+            #Set the mapserver layer style from the SLD file
+            
+            with open( unicode(tempSldPath), 'r' ) as fin:
+                sldContents = fin.read()
+
+            print msLayer.name;
+            if mapscript.MS_SUCCESS != msLayer.applySLD( sldContents, msLayer.name ):
+                QgsMessageLog.logMessage(
+                    u"Something went wrong applying the SLD style to the layer '%s'" % msLayer.name,
+                    "RT MapServer Exporter"
+                )
+
+            QFile.remove( tempSldPath )
+
 class LabelStyleSerializer(object):
     def __init__(self, layer, msLayer, msMap, emitFontDefinitions=False):
         """Serialize labels of a QGis vector layer to mapscript"""
@@ -106,11 +135,12 @@ class LabelStyleSerializer(object):
 
             
 class VectorLayerStyleSerializer(object):
-    def __init__(self, layer, msLayer, msMap):
+    def __init__(self, rctx, layer, msLayer, msMap):
         """Serialize a QGis vector layer renderer into mapscript classes"""
 
         self.msLayer = msLayer
         self.msMap = msMap
+        self.rctx = rctx
 
         # Set the size units to pixels here as that seems to be the most roboust
         # and independent of map units
@@ -140,7 +170,7 @@ class VectorLayerStyleSerializer(object):
 
         msClass = mapscript.classObj(self.msLayer)
 
-        for sym in renderer.symbols():
+        for sym in renderer.symbols(self.rctx):
             SymbolLayerSerializer(sym, msClass, self.msLayer, self.msMap)
 
 
@@ -159,7 +189,7 @@ class VectorLayerStyleSerializer(object):
             cv = cv.toString() if isinstance(cv, QVariant) else unicode(cv)
 
             msClass.setExpression((u'("[%s]" = "%s")' % (attr, cv)).encode('utf-8'))
-            SymbolLayerSerializer(renderer.symbols()[i], msClass, self.msLayer, self.msMap)
+            SymbolLayerSerializer(renderer.symbols(self.rctx)[i], msClass, self.msLayer, self.msMap)
             #add number to class name
             msClass.name+='_'+str(i)
             i = i + 1
@@ -183,7 +213,7 @@ class VectorLayerStyleSerializer(object):
                 attr, \
                 range.upperValue() \
             )).encode('utf-8'))
-            SymbolLayerSerializer(renderer.symbols()[i], msClass, self.msLayer, self.msMap)
+            SymbolLayerSerializer(renderer.symbols(self.rctx)[i], msClass, self.msLayer, self.msMap)
             #add number to class name
             msClass.name+='_'+str(i)
             i = i + 1
