@@ -35,6 +35,7 @@ def export(
     mapfilePath = u'',
     createFontFile = True,
     fontsetPath = u'',
+    useSLD = True,
     layers = [],
     legend = None,
     canvas = QgsMapCanvas()
@@ -109,7 +110,16 @@ def export(
                 'Skipped not supported layer: %s' % layer.name()
             )
             continue
-        
+       
+        # Bail out if the layer is accessed through OGR virtual file system drivers
+        if layer.source().startswith('/vsi'):
+            QMessageBox.warning(
+                None,
+                'RT MapServer Exporter',
+                'Layers inside compressed archives are not supported.'
+            )
+            continue
+
         # Create a layer object
         msLayer = mapscript.layerObj(msMap)
         msLayer.name = toUTF8(layer.name())
@@ -134,7 +144,6 @@ def export(
         msLayer.setMetaData('ows_title', msLayer.name)
         msLayer.setMetaData('ows_srs', toUTF8(layer.crs().authid()))
         msLayer.setMetaData('gml_include_items', 'all')
-        msLayer.setProcessing('LABEL_NO_CLIP=ON')
 
         # Layer connection
         if layer.providerType() == 'postgres':
@@ -191,7 +200,7 @@ def export(
             srsList = []
             srsList.append(toUTF8(layer.crs().authid()))
 
-            # Create necessary wms metadata
+            # Create necessary WMS metadata
             msLayer.setMetaData('ows_name', msLayer.name)
             msLayer.setMetaData('ows_srs', ' '.join(srsList))
 
@@ -207,11 +216,10 @@ def export(
         else:
             msLayer.data = toUTF8(layer.source())
 
+
         # Set layer style
         if layer.type() == QgsMapLayer.RasterLayer:
             if hasattr(layer, 'renderer'):    # QGis >= 1.9
-                # layer.renderer().opacity() has range [0,1]
-                # msLayer.opacity has range [0,100] => scale!
                 opacity = int(round(100 * layer.renderer().opacity()))
             else:
                 opacity = int(100 * layer.getTransparency() / 255.0)
@@ -227,8 +235,13 @@ def export(
             # Please note that we only emit font definitions in the label style serializer
             # if a fontset path is supplied. Otherwise we fall back to the default font.
             # (Font size is set under all circumstances, though.) 
-            #
-            Serialization.VectorLayerStyleSerializer(layer, msLayer, msMap)
+
+            if useSLD:
+                Serialization.SLDSerializer(layer, msLayer, msMap)
+            else:
+                rctx = QgsRenderContext.fromMapSettings(canvas.mapSettings())
+                Serialization.VectorLayerStyleSerializer(rctx, layer, msLayer, msMap)
+
             Serialization.LabelStyleSerializer(layer, msLayer, msMap, fontsetPath != '')
 
     # Save the map file
