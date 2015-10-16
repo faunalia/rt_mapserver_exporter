@@ -277,7 +277,7 @@ class SymbolLayerSerializer(object):
             msStyle.angle = hatchProperties['angle']
             msStyle.color = utils.serializeColor(sl.color())
         else:
-            msStyle.outlinecolor = utils.serializeColor(sl.color())
+            msStyle.color = utils.serializeColor(sl.color())
        
         # Emit line pattern only if we have a non-solid pen
         if sl.penStyle() != Qt.NoPen and sl.penStyle() != Qt.SolidLine:
