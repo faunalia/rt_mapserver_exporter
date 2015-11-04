@@ -110,9 +110,9 @@ def export(
                 'Skipped not supported layer: %s' % layer.name()
             )
             continue
-       
+      
         # Bail out if the layer is accessed through OGR virtual file system drivers
-        if layer.source().startswith('/vsi'):
+        if layer.source().startsWith('/vsi'):
             QMessageBox.warning(
                 None,
                 'RT MapServer Exporter',
