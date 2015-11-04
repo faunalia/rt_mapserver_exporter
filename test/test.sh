@@ -4,7 +4,7 @@
 SCRIPT=$(readlink -f "$0")
 BASEDIR=$(dirname "$(readlink -f "$0")")
 PLUGIN_DIR=~/.qgis2/python/plugins
-PYTHONPATH=/usr/share/qgis/python:/usr/lib/python2.7:/usr/lib/python2.7/site-packages:${PLUGIN_DIR}
+PYTHONPATH=/usr/share/qgis/python:${PLUGIN_DIR}
 CUSTOM_LOCALE=C
 
 # Paths related to fontset-mocking
