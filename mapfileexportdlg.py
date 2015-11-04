@@ -220,7 +220,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
                 continue
 
             # define the template file content
-            tmpl += '[resultset layer="%s"]\n' % layer.id()
+            tmpl += '[resultset layer="%s"]\n' % layer.name()
 
             layerTitle = layer.title() if layer.title() != "" else layer.name()
             tmpl += u'<b>"%s"</b>\n' % layerTitle
