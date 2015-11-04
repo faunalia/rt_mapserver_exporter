@@ -125,11 +125,13 @@ class LabelStyleSerializer(object):
 
             # Label definitions gets appended to the very first class on a layer, or to a new class
             # if no classes exist.
-            msClass = msLayer.getClass(0) \
-                if (msLayer.numclasses > 0) \
-                else mapscript.classObj(msLayer)
-
-            msClass.addLabel(msLabel)
+            #
+          
+            if msLayer.numclasses > 0:
+                for c in range(0, msLayer.numclasses):
+                    msLayer.getClass(c).addLabel(msLabel)
+            else:
+                mapscript.classObj(msLayer).addLabel(msLabel)
 
 
             
