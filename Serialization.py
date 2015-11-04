@@ -27,7 +27,6 @@ class SLDSerializer(object):
             with open( unicode(tempSldPath), 'r' ) as fin:
                 sldContents = fin.read()
 
-            print msLayer.name;
             if mapscript.MS_SUCCESS != msLayer.applySLD( sldContents, msLayer.name ):
                 QgsMessageLog.logMessage(
                     u"Something went wrong applying the SLD style to the layer '%s'" % msLayer.name,
@@ -170,7 +169,7 @@ class VectorLayerStyleSerializer(object):
 
         msClass = mapscript.classObj(self.msLayer)
 
-        for sym in renderer.symbols(self.rctx):
+        for sym in renderer.symbols():
             SymbolLayerSerializer(sym, msClass, self.msLayer, self.msMap)
 
 
@@ -189,7 +188,7 @@ class VectorLayerStyleSerializer(object):
             cv = cv.toString() if isinstance(cv, QVariant) else unicode(cv)
 
             msClass.setExpression((u'("[%s]" = "%s")' % (attr, cv)).encode('utf-8'))
-            SymbolLayerSerializer(renderer.symbols(self.rctx)[i], msClass, self.msLayer, self.msMap)
+            SymbolLayerSerializer(renderer.symbols()[i], msClass, self.msLayer, self.msMap)
             #add number to class name
             msClass.name+='_'+str(i)
             i = i + 1
@@ -213,7 +212,7 @@ class VectorLayerStyleSerializer(object):
                 attr, \
                 range.upperValue() \
             )).encode('utf-8'))
-            SymbolLayerSerializer(renderer.symbols(self.rctx)[i], msClass, self.msLayer, self.msMap)
+            SymbolLayerSerializer(renderer.symbols()[i], msClass, self.msLayer, self.msMap)
             #add number to class name
             msClass.name+='_'+str(i)
             i = i + 1
@@ -230,6 +229,7 @@ class SymbolLayerSerializer(object):
         msClass.name=msLayer.name
         for i in range(0, sym.symbolLayerCount()):
             sl = sym.symbolLayer(i)
+
 
             # Dispatch based on symbol layer type
             if isinstance(sl, QgsSimpleLineSymbolLayerV2):
