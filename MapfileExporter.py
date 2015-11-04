@@ -112,7 +112,7 @@ def export(
             continue
       
         # Bail out if the layer is accessed through OGR virtual file system drivers
-        if layer.source().startsWith('/vsi'):
+        if unicode(layer.source()).startswith('/vsi'):
             QMessageBox.warning(
                 None,
                 'RT MapServer Exporter',
@@ -144,6 +144,12 @@ def export(
         msLayer.setMetaData('ows_title', msLayer.name)
         msLayer.setMetaData('ows_srs', toUTF8(layer.crs().authid()))
         msLayer.setMetaData('gml_include_items', 'all')
+        msLayer.setMetaData('ows_include_items', 'all')
+        msLayer.setMetaData('wms_bbox_extended', 'true')
+        msLayer.setMetaData('wms_getfeatureinfo_formatlist', 'OGRGML')
+        msLayer.setMetaData('ows_extent',
+                '%s %s %s %s' % (extent.xMinimum(),extent.yMinimum(),extent.xMaximum(),extent.yMaximum())
+        )
 
         # Layer connection
         if layer.providerType() == 'postgres':
