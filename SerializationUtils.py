@@ -114,12 +114,6 @@ def sizeUnitToPx(val, unit):
         return val
 
 
-def ptToPx(pt):
-    """Convert points to pixels (assuming an 72dpi display)"""
-
-    return pt * 96 / 72
-
-
 def makeSymbolUUID(prefix=''):
     """Generate a globally unique identifier to be used in symbol names"""
 
@@ -386,7 +380,7 @@ def serializeFontDefinition(font, style):
     if style == '*':
         fontDef = family
     else:
-        fontDef = '%s-%s' % (family, style)
+        fontDef = ('%s-%s' % (family, style)) if (style != 'Normal') else family
 
     fm = QFontMetrics(font)
 
