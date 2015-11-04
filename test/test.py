@@ -83,7 +83,6 @@ QgsProject.instance().setFileName(TEST_PROJECT)
 QgsProject.instance().read(QFileInfo(TEST_PROJECT))
 
 from rt_mapserver_exporter import MapfileExporter
-plugin = rt_mapserver_exporter.classFactory(iface)
 
 MapfileExporter.export(
     name = str(QgsProject.instance().title()),
@@ -99,6 +98,7 @@ MapfileExporter.export(
     tempPath = TEMP_PATH,
     mapfilePath = MAPFILE_PATH,
     fontsetPath = 'fontset',
+    useSLD = False,
 
     legend = DummyLegendInterface(),
     layers = iface.layers()
