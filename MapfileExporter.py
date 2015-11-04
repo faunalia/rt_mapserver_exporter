@@ -38,7 +38,7 @@ def export(
     useSLD = True,
     layers = [],
     legend = None,
-    canvas = QgsMapCanvas()
+    canvas = None
 ):
     # Create a new msMap
     msMap = mapscript.mapObj()
@@ -88,7 +88,8 @@ def export(
     msMap.setMetaData('ows_title', msMap.name)
     msMap.setMetaData('ows_onlineresource', '%s?map=%s' % (mapServerURL, toUTF8(mapfilePath)))
     srsList = []
-    srsList.append(toUTF8(canvas.mapRenderer().destinationCrs().authid()))
+    if canvas is not None:
+        srsList.append(toUTF8(canvas.mapRenderer().destinationCrs().authid()))
     #msMap.setMetaData('ows_srs', ' '.join(srsList))
     msMap.setMetaData('ows_enable_request', '*')
     msMap.setMetaData('wfs_encoding', 'UTF-8')
@@ -110,7 +111,7 @@ def export(
                 'Skipped not supported layer: %s' % layer.name()
             )
             continue
-      
+        
         # Bail out if the layer is accessed through OGR virtual file system drivers
         if unicode(layer.source()).startswith('/vsi'):
             QMessageBox.warning(
@@ -245,7 +246,11 @@ def export(
             if useSLD:
                 Serialization.SLDSerializer(layer, msLayer, msMap)
             else:
-                rctx = QgsRenderContext.fromMapSettings(canvas.mapSettings())
+                if canvas is not None:
+                    rctx = QgsRenderContext.fromMapSettings(canvas.mapSettings())
+                else:
+                    rctx = None
+
                 Serialization.VectorLayerStyleSerializer(rctx, layer, msLayer, msMap)
 
             Serialization.LabelStyleSerializer(layer, msLayer, msMap, fontsetPath != '')

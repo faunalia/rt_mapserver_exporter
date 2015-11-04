@@ -36,7 +36,7 @@ def maybeSetLayerSizeUnitFromMap(unit, msLayer):
         FIXME: This is *REALLY* ugly.
     """
 
-    if unit == QgsSymbolV2.MapUnit:
+    if (unit == QgsSymbolV2.MapUnit) and (iface is not None):
         msLayer.sizeunits = SIZE_UNIT_MAP[
             iface.mapCanvas().mapSettings().destinationCrs().mapUnits()
         ]
