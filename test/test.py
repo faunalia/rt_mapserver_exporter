@@ -4,13 +4,13 @@ from PyQt4.Qt import *
 from qgis.core import *
 from qgis.gui import *
 
+import sys
+import locale
 from datetime import datetime
 from os import path
 
 import rt_mapserver_exporter
 import mapscript
-
-import locale
 
 QGIS_PREFIX  = '/usr'
 TEST_WD      = path.dirname(path.abspath(__file__))
@@ -34,9 +34,10 @@ def computeExtent(extents):
 
     return r.buffer(EXTENT_BUFFER_SIZE)
 
-QgsApplication.setPrefixPath(QGIS_PREFIX, True)
-QgsApplication.initQgis()
-app = QgsApplication([], True)
+QgsApplication.setPrefixPath('/usr', True)  #<-- optional, if you have set QGIS_PREFIX_PATH
+QgsApplication.setAuthDbDirPath('/home/me/test')  #<-- need to define where the auth database is created (or exists)
+qgs = QgsApplication(sys.argv, False)
+qgs.initQgis()
 
 if len(QgsProviderRegistry.instance().providerList()) == 0:
     raise RuntimeError('No data providers available.')
@@ -69,7 +70,6 @@ class DummyLegendInterface(object):
         return True
 
 iface = DummyInterface()
-
 
 if path.isfile(TEST_PROJECT):
     try:
