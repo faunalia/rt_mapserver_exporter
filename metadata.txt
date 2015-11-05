@@ -5,7 +5,7 @@ description=Export QGIS project to MapFile.
     Developed with funding from Regione Toscana-SITA.
 	Development of the Python-based (non-SLD) exporter was sponsored by ViaMap Ltd., Budapest, Hungary.
 
-version=0.4.0
+version=0.5.0
 qgisMinimumVersion=2.0
 
 category=Plugin
@@ -17,7 +17,9 @@ email=info@faunalia.eu
 
 ; start of optional metadata
 
-changelog=0.4.0
+changelog=0.5.0
+    Merged pure python map file generation without SLD dev by Ádám Barancsuk
+    0.4.0
 	added sld External Graphic validation regexp
 	0.3.9
 	bug on generalised regexp allowing to work on unix envs
@@ -48,7 +50,10 @@ about=This plugin helps to export a QGis Project as mapserver mapfile.
 	It needs python-mapscript istalled in your machine.
 	This is available as a Debian (therefore Ubuntu) package, and as a part of OSGeo4W on Windows.
 	It sets main class, layer and symbols with some limitation.
-	Internally It uses SLD as interchange format among QGIS and Mapserver/Mapscript adding some more features where not covered by the interchange format transformation.
+	map file can be generated in two way:
+	A) SLD based as interchange format among QGIS and Mapserver/Mapscript
+	QGIS SLD have some features not covered by the interchange format transformation.
+	B) Pure python Style/map file transformation that would cover mor style mapping
 	!!!WARNING!!!
 	In 0.4.0 was added SLD external graphic validation regexp. If you plan to add any external graphics (svg or pixmap) you MUST set a validation regexp otherwise you'll receive mapscript validation error.
 	This will work only if your mapscript version supports sld_external_graphic validation.
