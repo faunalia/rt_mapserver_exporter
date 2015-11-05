@@ -1,3 +1,7 @@
 *.pyc
 *~
-
+test/test.map
+test/test.png
+test/fonts.txt
+test/fontset
+test/data/assets/svgrasters/*

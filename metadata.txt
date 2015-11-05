@@ -3,13 +3,14 @@
 name=RT MapServer Exporter
 description=Export QGIS project to MapFile.
     Developed with funding from Regione Toscana-SITA.
+	Development of the Python-based (non-SLD) exporter was sponsored by ViaMap Ltd., Budapest, Hungary.
 
 version=0.4.0
 qgisMinimumVersion=2.0
 
 category=Plugin
 
-author=Giuseppe Sucameli - Luigi Pirelli (Faunalia)
+author=Giuseppe Sucameli - Luigi Pirelli (Faunalia) - Ádám Barancsuk (ViaMap Ltd.)
 email=info@faunalia.eu
 
 ; end of mandatory metadata

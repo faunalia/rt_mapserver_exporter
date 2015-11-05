@@ -27,63 +27,13 @@ from qgis.core import *
 from qgis.gui import *
 
 from .ui.mapfileexportdlg_ui import Ui_MapfileExportDlg
-import mapscript
-import re
 
-_toUtf8 = lambda s: unicode(s).encode('utf8')
-
+import MapfileExporter
+import utils
+from utils import toUTF8
 
 class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
 
-    unitMap = {
-        QGis.DecimalDegrees : mapscript.MS_DD,
-        QGis.Meters : mapscript.MS_METERS,
-        QGis.Feet : mapscript.MS_FEET
-    }
-
-    onOffMap = {
-        True : mapscript.MS_ON,
-        False : mapscript.MS_OFF
-    }
-
-    trueFalseMap = {
-        True : mapscript.MS_TRUE,
-        False : mapscript.MS_FALSE
-    }
-
-    @classmethod
-    def getLayerType(self, layer):
-        if layer.type() == QgsMapLayer.RasterLayer:
-            return mapscript.MS_LAYER_RASTER
-        if layer.geometryType() == QGis.Point:
-            return mapscript.MS_LAYER_POINT
-        if layer.geometryType() == QGis.Line:
-            return mapscript.MS_LAYER_LINE
-        if layer.geometryType() == QGis.Polygon:
-            return mapscript.MS_LAYER_POLYGON
-
-    @classmethod
-    def getLabelPosition(self, palLabel):
-        quadrantPosition = palLabel.quadOffset  
-        if quadrantPosition == QgsPalLayerSettings.QuadrantAboveLeft: # y=1 x=-1 
-            return mapscript.MS_UL
-        if quadrantPosition == QgsPalLayerSettings.QuadrantAbove: # y=1 x=0
-            return mapscript.MS_UC
-        if quadrantPosition == QgsPalLayerSettings.QuadrantAboveRight: # y=1 x=1
-            return mapscript.MS_UR
-        if quadrantPosition == QgsPalLayerSettings.QuadrantLeft: # y=0 x=-1
-            return mapscript.MS_CL
-        if quadrantPosition == QgsPalLayerSettings.QuadrantOver: # y=0 x=0
-            return mapscript.MS_CC
-        if quadrantPosition == QgsPalLayerSettings.QuadrantRight: # y=0 x=1
-            return mapscript.MS_CR
-        if quadrantPosition == QgsPalLayerSettings.QuadrantBelowLeft: # y=-1 x=-1 
-            return mapscript.MS_LL
-        if quadrantPosition == QgsPalLayerSettings.QuadrantBelow: # y=-1 x=0
-            return mapscript.MS_LC
-        if quadrantPosition == QgsPalLayerSettings.QuadrantBelowRight: # y=-1 x=1
-            return mapscript.MS_LR
-        return mapscript.MS_AUTO
 
     def __init__(self, iface, parent=None):
         QDialog.__init__(self, parent)
@@ -93,7 +43,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
         self.legend = self.iface.legendInterface()
 
         # hide map unit combo and label
-        self.label4.hide()
+        self.lblMapUnits.hide()
         self.cmbMapUnits.hide()
 
         # setup the template table
@@ -111,6 +61,12 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
         if title != "":
             self.txtMapName.setText( title )
 
+        # Set the export method based on the user's last choice (default to SLD)
+        settings = QSettings()
+        useSLD = settings.value("/rt_mapserver_exporter/useSLD", True, type=bool)
+        self.checkExportSLD.setChecked(useSLD);
+        self.checkExportCustom.setChecked(not useSLD);
+
         # fill the image format combo
         self.cmbMapImageType.addItems( ["png", "gif", "jpeg", "svg", "GTiff"] )
 
@@ -118,6 +74,49 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
         QObject.connect( self.btnChooseTemplate, SIGNAL("clicked()"), self.selectTemplateBody )
         QObject.connect( self.btnChooseTmplHeader, SIGNAL("clicked()"), self.selectTemplateHeader )
         QObject.connect( self.btnChooseTmplFooter, SIGNAL("clicked()"), self.selectTemplateFooter )
+        QObject.connect( self.lblHelpMeDecide, SIGNAL("linkActivated(QString)"), self.showExportMethodHint )
+
+    def showExportMethodHint(self):
+        QMessageBox.information(
+            self,
+            "On Vector Style Export Methods",
+            """ <style>p { margin-bottom: 1em; }</style>
+
+                <p>MapServer Exporter offers two methods for exporting vector layer styles (export of non-vector layers
+                remains unchanged):</p>
+
+                <ul>
+                    <li><p><b>SLD-based method:</b></p>
+
+                        <p>This method uses the SLD (Styled Layer Descriptor) standard as the exchange format for vector
+                        styles between QGIS and MapServer. However, the SLD standard is only partially implemented in 
+                        both QGIS and MapServer. This may result in incorrectly or incompletely exported vector
+                        styles.</p>
+                        
+                        <p>Support for SLD might improve in the future and when it does, you get to enjoy it
+                        automatically, without updating this plugin.</p>
+
+                        <p><i>(This is the method used by previous versions of MapServer Exporter.)</i></p>
+                    </li>
+
+                    <li><p><b>New Python-based exporter:</b></p>
+
+                        <p>This method uses a custom-made exporter written in Python. It does not aim to be
+                        a comprehensive solution to the problem of exporting vector styles but we believe it currently
+                        offers a more faithful rendering of the most commonly used style elements than the SLD-based
+                        method does.</p>
+
+                        <p>This exporter is included with the plugin, therefore new features and bug fixes depend on
+                        updating the plugin itself. If SLD support gains momentum in the future, certain parts of it may
+                        become obsolete and will be superseded by the first method.</p>
+
+                        <p><a href="https://github.com/faunalia/rt_mapserver_exporter/pull/5#issue-101595345">
+                            Click here for a visual comparison and a list of features supported by the new method.
+                        </a></p>
+                    </li>
+                </ul>
+            """
+        )
 
     def selectMapFile(self):
         # retrieve the last used map file path
@@ -163,359 +162,65 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
         # check user inputs
         if self.txtMapFilePath.text() == "":
             QMessageBox.warning(self, "RT MapServer Exporter", "Mapfile output path is required")
-            return
 
-        # create a new ms_map
-        ms_map = mapscript.mapObj()
-        ms_map.name = _toUtf8( self.txtMapName.text() )
-
-        # map size
-        width, height = int(self.txtMapWidth.text()), int(self.txtMapHeight.text())
-        widthOk, heightOk = isinstance(width, int), isinstance(height, int)
-        if widthOk and heightOk:
-            ms_map.setSize( width, height )
-
-        # map units
-        ms_map.units = self.unitMap[ self.canvas.mapUnits() ]
-        if self.cmbMapUnits.currentIndex() >= 0:
-            units, ok = self.cmbMapUnits.itemData( self.cmbMapUnits.currentIndex() )
-            if ok:
-                ms_map.units = units
-
-        # map extent
-        extent = self.canvas.fullExtent()
-        ms_map.extent.minx = extent.xMinimum()
-        ms_map.extent.miny = extent.yMinimum()
-        ms_map.extent.maxx = extent.xMaximum()
-        ms_map.extent.maxy = extent.yMaximum()
-        ms_map.setProjection( _toUtf8( self.canvas.mapRenderer().destinationCrs().toProj4() ) )
-
-        if self.txtMapShapePath.text() != "":
-            ms_map.shapepath = _toUtf8( self.getMapShapePath() )
-
-        # image section
-        r,g,b,a = self.canvas.canvasColor().getRgb()
-        ms_map.imagecolor.setRGB( r, g, b )    #255,255,255
-        ms_map.setImageType( _toUtf8( self.cmbMapImageType.currentText() ) )
-        ms_outformat = ms_map.getOutputFormatByName( ms_map.imagetype )
-        ms_outformat.transparent = self.onOffMap[ True ]
-
-        # legend section
-        #r,g,b,a = self.canvas.canvasColor().getRgb()
-        #ms_map.legend.imageColor.setRgb( r, g, b )
-        #ms_map.legend.status = mapscript.MS_ON
-        #ms_map.legend.keysizex = 18
-        #ms_map.legend.keysizey = 12
-        #ms_map.legend.label.type = mapscript.MS_BITMAP
-        #ms_map.legend.label.size = MEDIUM??
-        #ms_map.legend.label.color.setRgb( 0, 0, 89 )
-        #ms_map.legend.label.partials = self.trueFalseMap[ self.checkBoxPartials ]
-        #ms_map.legend.label.force = self.trueFalseMap[ self.checkBoxForce ]
-        #ms_map.legend.template = "[templatepath]"
-
-        # web section
-        ms_map.web.imagepath = _toUtf8( self.getWebImagePath() )
-        ms_map.web.imageurl = _toUtf8( self.getWebImageUrl() )
-        ms_map.web.temppath = _toUtf8( self.getWebTemporaryPath() )
-        # add validation block if set a regexp
-        # no control on regexp => it will be done by mapscript applySld
-        # generating error in case regexp is wrong
-        validationRegexp = _toUtf8( self.getExternalGraphicRegexp() )
-        if validationRegexp != "":
-            ms_map.web.validation.set("sld_external_graphic", validationRegexp)
-
-        # web template
-        ms_map.web.template = _toUtf8( self.getTemplatePath() )
-        ms_map.web.header = _toUtf8( self.getTemplateHeaderPath() )
-        ms_map.web.footer = _toUtf8( self.getTemplateFooterPath() )
-
-        # map metadata
-        ms_map.setMetaData( "ows_title", ms_map.name )
-        ms_map.setMetaData( "ows_onlineresource", _toUtf8( u"%s?map=%s" % (self.txtMapServerUrl.text(), self.txtMapFilePath.text()) ) )
-        srsList = []
-        srsList.append( _toUtf8( self.canvas.mapRenderer().destinationCrs().authid() ) )
-        ms_map.setMetaData( "ows_srs", ' '.join(srsList) )
-        ms_map.setMetaData( "ows_enable_request", "*" )
-
-        for layer in self.legend.layers():
-            # check if layer is a supported type... seems return None if type is not supported (e.g. csv)
-            if ( self.getLayerType( layer ) == None):
-                QMessageBox.warning(self, "RT MapServer Exporter", "Skipped not supported layer: %s" % layer.name())
-                continue
+        else:
+            units = utils.unitMap[self.canvas.mapUnits()]
+            if self.cmbMapUnits.currentIndex() >= 0:
+                u, result = self.cmbMapUnits.itemData(self.cmbMapUnits.currentIndex())
+                if result:
+                    units = u
             
-            # create a layer object
-            ms_layer = mapscript.layerObj( ms_map )
-            ms_layer.name = _toUtf8( layer.name() )
-            ms_layer.type = self.getLayerType( layer )
-            ms_layer.status = self.onOffMap[ self.legend.isLayerVisible( layer ) ]
+            MapfileExporter.export(
+                name = toUTF8(self.txtMapName.text()),
+                width = int(self.txtMapWidth.text()),
+                height = int(self.txtMapHeight.text()),
+                units = units,
+                extent = self.canvas.fullExtent(),
+                projection = toUTF8(self.canvas.mapRenderer().destinationCrs().toProj4()),
+                shapePath = toUTF8(self.txtMapShapePath.text()),
+                backgroundColor = self.canvas.canvasColor(),
+                imageType = toUTF8(self.cmbMapImageType.currentText()),
+                imagePath = toUTF8(self.getWebImagePath()),
+                imageURL = toUTF8(self.getWebImageUrl()),
+                tempPath = toUTF8(self.getWebTemporaryPath()),
+                validationRegexp =  toUTF8(self.getExternalGraphicRegexp()),
+                templatePath = toUTF8(self.getTemplatePath()),
+                templateHeaderPath = toUTF8(self.getTemplateHeaderPath()),
+                templateFooterPath = toUTF8(self.getTemplateFooterPath()),
+                mapServerURL = toUTF8(self.txtMapServerUrl.text()),
+                mapfilePath = self.txtMapFilePath.text(),
+                createFontFile = self.checkCreateFontFile.isChecked(),
+                fontsetPath = toUTF8(self.txtMapFontsetPath.text()),
+                useSLD = self.checkExportSLD.isChecked(),
 
-            # layer extent
-            extent = layer.extent()
-            ms_layer.extent.minx = extent.xMinimum()
-            ms_layer.extent.miny = extent.yMinimum()
-            ms_layer.extent.maxx = extent.xMaximum()
-            ms_layer.extent.maxy = extent.yMaximum()
+                layers = self.legend.layers(),
+                legend = self.legend
+            )
 
-            ms_layer.setProjection( _toUtf8( layer.crs().toProj4() ) )
+            settings = QSettings()
+            settings.setValue("/rt_mapserver_exporter/useSLD", self.checkExportSLD.isChecked())
 
-            if layer.hasScaleBasedVisibility():
-                ms_layer.minscaledenom = layer.minimumScale()
-                ms_layer.maxscaledenom = layer.maximumScale()
-
-            ms_layer.setMetaData( "ows_title", ms_layer.name )
-
-            # layer connection
-            if layer.providerType() == 'postgres':
-                ms_layer.setConnectionType( mapscript.MS_POSTGIS, "" )
-                uri = QgsDataSourceURI( layer.source() )
-                ms_layer.connection = _toUtf8( uri.connectionInfo() )
-                data = u"%s FROM %s" % ( uri.geometryColumn(), uri.quotedTablename() )
-                if uri.keyColumn() != "":
-                    data += u" USING UNIQUE %s" % uri.keyColumn()
-                data += u" USING UNIQUE %s" % layer.crs().postgisSrid()
-                if uri.sql() != "":
-                  data += " FILTER (%s)" % uri.sql()
-                ms_layer.data = _toUtf8( data )
-
-            elif layer.providerType() == 'wms':
-                ms_layer.setConnectionType( mapscript.MS_WMS, "" )
-
-                uri = QUrl( "http://www.fake.eu/?"+layer.source() )
-                ms_layer.connection = _toUtf8( uri.queryItemValue("url") )
-
-                # loop thru wms sub layers
-                wmsNames = []
-                wmsStyles = []
-                wmsLayerNames = layer.dataProvider().subLayers()
-                wmsLayerStyles = layer.dataProvider().subLayerStyles()
-                
-                for index in range(len(wmsLayerNames)):
-                    wmsNames.append( _toUtf8( wmsLayerNames[index] ) )
-                    wmsStyles.append( _toUtf8( wmsLayerStyles[index] ) )
-
-                # output SRSs
-                srsList = []
-                srsList.append( _toUtf8( layer.crs().authid() ) )
-
-                # Create necessary wms metadata
-                ms_layer.setMetaData( "ows_name", ','.join(wmsNames) )
-                ms_layer.setMetaData( "wms_server_version", "1.1.1" )
-                ms_layer.setMetaData( "ows_srs", ' '.join(srsList) )
-                #ms_layer.setMetaData( "wms_format", layer.format() )
-                ms_layer.setMetaData( "wms_format", ','.join(wmsStyles) )
-
-            elif layer.providerType() == 'wfs':
-                ms_layer.setConnectionType( mapscript.MS_WMS, "" )
-                uri = QgsDataSourceURI( layer.source() )
-                ms_layer.connection = _toUtf8( uri.uri() )
-
-                # output SRSs
-                srsList = []
-                srsList.append( _toUtf8( layer.crs().authid() ) )
-
-                # Create necessary wms metadata
-                ms_layer.setMetaData( "ows_name", ms_layer.name )
-                #ms_layer.setMetaData( "wfs_server_version", "1.1.1" )
-                ms_layer.setMetaData( "ows_srs", ' '.join(srsList) )
-
-            elif layer.providerType() == 'spatialite':
-                ms_layer.setConnectionType( mapscript.MS_OGR, "" )
-                uri = QgsDataSourceURI( layer.source() )
-                ms_layer.connection = _toUtf8( uri.database() )
-                ms_layer.data = _toUtf8( uri.table() )
-
-            elif layer.providerType() == 'ogr':
-                #ms_layer.setConnectionType( mapscript.MS_OGR, "" )
-                ms_layer.data = _toUtf8( layer.source().split('|')[0] )
-
-            else:
-                ms_layer.data = _toUtf8( layer.source() )
-
-            # set layer style
-            if layer.type() == QgsMapLayer.RasterLayer:
-                if hasattr(layer, 'renderer'):    # QGis >= 1.9
-                    # layer.renderer().opacity() has range [0,1]
-                    # ms_layer.opacity has range [0,100] => scale!
-                    opacity = int( round(100 * layer.renderer().opacity()) )
-                else:
-                    opacity = int( 100 * layer.getTransparency() / 255.0 )
-                ms_layer.opacity = opacity
-
-            else:
-                # use a SLD file set the layer style
-                tempSldFile = QTemporaryFile("rt_mapserver_exporter-XXXXXX.sld")
-                tempSldFile.open()
-                tempSldPath = tempSldFile.fileName()
-                tempSldFile.close()
-                
-                # export the QGIS layer style to SLD file
-                errMsg, ok = layer.saveSldStyle( tempSldPath )
-                if not ok:
-                    QgsMessageLog.logMessage( errMsg, "RT MapServer Exporter" )
-                else:
-                    # set the mapserver layer style from the SLD file
-                    #QFile.copy(tempSldPath, tempSldPath+".save")
-                    #print "SLD saved file: ", tempSldPath+".save"
-                    with open( unicode(tempSldPath), 'r' ) as fin:
-                        sldContents = fin.read()
-                    if mapscript.MS_SUCCESS != ms_layer.applySLD( sldContents, ms_layer.name ):
-                        QgsMessageLog.logMessage( u"Something went wrong applying the SLD style to the layer '%s'" % ms_layer.name, "RT MapServer Exporter" )
-                    QFile.remove( tempSldPath )
-
-                    # set layer labels
-                    #XXX the following code MUST be removed when QGIS will
-                    # have SLD label support
-                    labelingEngine = self.canvas.mapRenderer().labelingEngine()
-                    if labelingEngine and labelingEngine.willUseLayer( layer ):
-                        palLayer = labelingEngine.layer( layer.id() )
-                        if palLayer.enabled:
-                            if not palLayer.isExpression:
-                                ms_layer.labelitem = _toUtf8( palLayer.fieldName )
-                            else:
-                                #XXX expressions won't be supported until
-                                # QGIS have SLD label support
-                                pass
-        
-                            if palLayer.scaleMin > 0:
-                                ms_layer.labelminscaledenom = palLayer.scaleMin
-                            if palLayer.scaleMax > 0:
-                                ms_layer.labelmaxscaledenom = palLayer.scaleMax
-        
-                            ms_label = mapscript.labelObj()
-        
-                            ms_label.type = mapscript.MS_TRUETYPE
-                            ms_label.antialias = mapscript.MS_TRUE
-        
-                            ms_label.position = self.getLabelPosition( palLayer )
-                            # TODO: convert offset to pixels
-                            ms_label.offsetx = int( palLayer.xOffset )
-                            ms_label.offsety = int( palLayer.yOffset )
-                            ms_label.angle = palLayer.angleOffset
-        
-                            # set label font name, size and color
-                            fontFamily = palLayer.textFont.family().replace(" ", "")
-                            fontStyle = palLayer.textNamedStyle.replace(" ", "")
-                            ms_label.font = _toUtf8( u"%s-%s" % (fontFamily, fontStyle) )
-                            if palLayer.textFont.pixelSize() > 0:
-                                ms_label.size = int( palLayer.textFont.pixelSize() )
-                            r,g,b,a = palLayer.textColor.getRgb()
-                            ms_label.color.setRGB( r, g, b )
-        
-                            if palLayer.fontLimitPixelSize:
-                                ms_label.minsize = palLayer.fontMinPixelSize
-                                ms_label.maxsize = palLayer.fontMaxPixelSize
-                            ms_label.wrap = _toUtf8( palLayer.wrapChar )
-        
-                            ms_label.priority = palLayer.priority
-        
-                            # TODO: convert buffer size to pixels
-                            ms_label.buffer = int( palLayer.bufferSize )
-        
-                            if int( palLayer.minFeatureSize ) > 0:
-                                # TODO: convert feature size from mm to pixels
-                                ms_label.minfeaturesize = int( palLayer.minFeatureSize )
-        
-                            ms_class = mapscript.classObj()
-                            ms_class.addLabel( ms_label )
-                            ms_layer.insertClass( ms_class )
-
-
-        # save the map file now!
-        if mapscript.MS_SUCCESS != ms_map.save( _toUtf8( self.txtMapFilePath.text() )     ):
-            return
-
-        # Most of the following code does not use mapscript because it asserts
-        # paths you supply exists, but this requirement is usually not meet on
-        # the QGIS client used to generate the mafile.
-
-        # get the mapfile content as string so we can manipulate on it
-        mesg = "Reload Map file %s to manipulate it" % self.txtMapFilePath.text()
-        QgsMessageLog.logMessage( mesg, "RT MapServer Exporter" )
-        fin = open( _toUtf8(self.txtMapFilePath.text()), 'r' )
-        parts = []
-        line = fin.readline()
-        while line != "":
-            line = line.rstrip('\n')
-            parts.append(line)
-            line = fin.readline()
-        fin.close()
-        
-        partsContentChanged = False
-
-        # retrieve the list of used font aliases searching for FONT keywords
-        fonts = []
-        searchFontRx = re.compile("^\\s*FONT\\s+")
-        for line in filter(searchFontRx.search, parts):
-            # get the font alias, remove quotes around it
-            fontName = re.sub(searchFontRx, "", line)[1:-1]
-            # remove spaces within the font name
-            fontAlias = fontName.replace(" ", "")
-
-            # append the font alias to the font list
-            if fontAlias not in fonts:
-                fonts.append( fontAlias )
-
-                # update the font alias in the mapfile
-                # XXX: the following lines cannot be removed since the SLD file
-                # could refer a font whose name contains spaces. When SLD specs
-                # ate clear on how to handle fonts than we'll think whether
-                # remove it or not.
-                replaceFontRx = re.compile( u"^(\\s*FONT\\s+\")%s(\".*)$" % QRegExp.escape(fontName) )
-                parts = [ replaceFontRx.sub(u"\g<1>%s\g<2>" % fontAlias, part) for part in parts ]
-                partsContentChanged = True
-
-        # create the file containing the list of font aliases used in the
-        # mapfile
-        if self.checkCreateFontFile.isChecked():
-            fontPath = QFileInfo(_toUtf8(self.txtMapFilePath.text())).dir().filePath(u"fonts.txt")
-            with open( unicode(fontPath), 'w' ) as fout:
-                for fontAlias in fonts:
-                    fout.write( unicode(fontAlias) )
-
-        # add the FONTSET keyword with the associated path
-        if self.txtMapFontsetPath.text() != "":
-            # get the index of the first instance of MAP string in the list
-            pos = parts.index( filter(lambda x: re.compile("^MAP(\r\n|\r|\n)*$").match(x), parts)[0] )
-            if pos >= 0:
-                parts.insert( pos+1, u'  FONTSET "%s"' % self.txtMapFontsetPath.text() )
-                partsContentChanged = True
-            else:
-                QgsMessageLog.logMessage( u"'FONTSET' keyword not added to the mapfile: unable to locate the 'MAP' keyword...", "RT MapServer Exporter" )
-
-        # if mapfile content changed, store the file again at the same path
-        if partsContentChanged:
-            with open( _toUtf8(self.txtMapFilePath.text()), 'w' ) as fout:
-                for part in parts:
-                    fout.write( part+"\n" )
-
-        # XXX for debugging only: let's have a look at the map result! :)
-        # XXX it works whether the file pointed by the fontset contains ALL the
-        # aliases of fonts referred from the mapfile.
-        #ms_map = mapscript.mapObj( unicode( self.txtMapFilePath.text() ) )
-        #ms_map.draw().save( _toUtf8( self.txtMapFilePath.text() + ".png" )    , ms_map )
-
-        QDialog.accept(self)
-
+            QDialog.accept(self)
 
     def generateTemplate(self):
         tmpl = u""
 
         if self.getTemplateHeaderPath() == "":
             tmpl += u'''<!-- MapServer Template -->
-<html>
-  <head>
+    <html>
+    <head>
     <title>%s</title>
-  </head>
-  <body>
-''' % self.txtMapName.text()
+    </head>
+    <body>
+    ''' % self.txtMapName.text()
 
         for lid, orientation in self.templateTable.model().getObjectIter():
-            layer = QgsMapLayerRegistry.instance().mapLayer( lid )
+            layer = QgsMapLayerRegistry.instance().mapLayer(lid)
             if not layer:
                 continue
 
             # define the template file content
-            tmpl += '[resultset layer="%s"]\n' % layer.id()
+            tmpl += '[resultset layer="%s"]\n' % layer.name()
 
             layerTitle = layer.title() if layer.title() != "" else layer.name()
             tmpl += u'<b>"%s"</b>\n' % layerTitle
@@ -560,7 +265,7 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
 
         if self.getTemplateFooterPath() == "":
             tmpl += '''  </body>
-</html>'''
+    </html>'''
 
         return tmpl
 
@@ -573,8 +278,8 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
             tmplContent = self.generateTemplate()
             # store the template alongside the mapfile
             tmplPath = self.txtMapFilePath.text() + ".html.tmpl"
-            with open( unicode(tmplPath), 'w' ) as fout:
-                fout.write( tmplContent )
+            with open(unicode(tmplPath), 'w') as fout:
+                fout.write(toUTF8(tmplContent))
             return tmplPath
 
     def getTemplateHeaderPath(self):
@@ -599,8 +304,6 @@ class MapfileExportDlg(QDialog, Ui_MapfileExportDlg):
 
     def getExternalGraphicRegexp(self):
         return self.txtExternalGraphicRegexp.text()
-
-
 class TemplateDelegate(QItemDelegate):
     """ delegate with some special item editors """
 
