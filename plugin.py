@@ -62,7 +62,11 @@ class Plugin:
         dlg.exec_()
 
     def run(self):
-        from .mapfileexportdlg import MapfileExportDlg
-        dialog = MapfileExportDlg(self.iface, self.iface.mainWindow())
-        dialog.show()
-        dialog.exec_()
+        try:
+            import mapscript
+            from .mapfileexportdlg import MapfileExportDlg
+            dialog = MapfileExportDlg(self.iface, self.iface.mainWindow())
+            dialog.show()
+            dialog.exec_()
+        except ImportError:
+            QMessageBox.warning(None, "Import Error", "Missing module: 'mapscript'. Please install 'mapscript-python' first.")
